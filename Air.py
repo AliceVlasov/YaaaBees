@@ -13,15 +13,16 @@ class Pump:
     def __init__(self, id, speed):
         self.id = id # location on the motorboard
         self.speed = speed # motor speed
-        mc.stop_motor(id)
     
     def set_speed(self, new_speed):
         self.speed = new_speed
 
     def run(self):
+        print("starting pump {}".format(self.id))
         mc.move_motor(self.id, self.speed)
     
     def stop(self):
+        print("stopping pump {}".format(self.id))
         mc.stop_motor(self.id)
 
     def run_for(self, seconds):
@@ -32,9 +33,11 @@ class Pump:
 class Valve:
     def __init__(self, id):
         self.id = id # location on the motorboard
-        self.speed = 50 
+        self.speed = 100 # need this to be 100 or the valve won't close
+        self.close()
     
     def open(self):
+        print("opening valve {}".format(self.id))
         mc.stop_motor(self.id)
 
     def open_for(self, seconds):
@@ -43,7 +46,8 @@ class Valve:
         self.close()
 
     def close(self):
-        mc.start_motor(self.id, self.speed)
+        print("closing valve {}".format(self.id))
+        mc.move_motor(self.id, self.speed)
     
     def close_for(self, seconds):
         self.close()
