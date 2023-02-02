@@ -20,6 +20,10 @@ class Pump:
     def run(self):
         print("starting pump {}".format(self.id))
         mc.move_motor(self.id, self.speed)
+
+    def run(self, speed):
+        print("starting pump {}".format(self.id))
+        mc.move_motor(self.id, speed)
     
     def stop(self):
         print("stopping pump {}".format(self.id))
