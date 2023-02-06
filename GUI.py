@@ -1,10 +1,10 @@
 from tkinter import *
 from time import sleep
-#from air_control import Air
+from air_control import Air
 
 class Window(Frame):
     inflate = False
-    #pump = Air.Pump()
+    pump = Air.Pump()
 
     def __init__(self, master=None):
         Frame.__init__(self, master)     
@@ -15,7 +15,7 @@ class Window(Frame):
 
         # create button, link it to clickExitButton()
         inflateButton = Button(self, text="Inflate", command=self.setInflate, bg="firebrick", fg="white")
-        w = Scale(self.master, from_=10, to=100, orient=HORIZONTAL)
+        w = Scale(self.master, from_=50, to=100, orient=HORIZONTAL)
         w.pack()
         self.slider = w
 
@@ -28,14 +28,13 @@ class Window(Frame):
     def setInflate(self):
         self.inflate = not self.inflate
         self.speed = self.slider.get()
-        print(self.inflate)
-        print(self.speed)
-        """
+        print("Inflating: " + str(self.inflate))
+        print("Speed: " + str(self.speed))
+        
         if self.inflate:
             self.pump.run()
         else:
             self.pump.stop()
-        """
 
     def holdInflateButton(self):
         if self.inflate == True:
