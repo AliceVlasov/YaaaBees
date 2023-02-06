@@ -1,10 +1,10 @@
-from tkinter import *
+from Tkinter import *
 from time import sleep
-from air_control import Air
+from Air import Pump
 
 class Window(Frame):
     inflate = False
-    pump = Air.Pump()
+    pump = Pump(1, 50)
 
     def __init__(self, master=None):
         Frame.__init__(self, master)     
@@ -30,9 +30,9 @@ class Window(Frame):
         self.speed = self.slider.get()
         print("Inflating: " + str(self.inflate))
         print("Speed: " + str(self.speed))
-        
+
         if self.inflate:
-            self.pump.run()
+            self.pump.runWithSpeed(self.speed)
         else:
             self.pump.stop()
 

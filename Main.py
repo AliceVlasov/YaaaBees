@@ -1,4 +1,4 @@
-from tkinter import *
+from Tkinter import *
 from GUI import Window
 
 root = Tk()
