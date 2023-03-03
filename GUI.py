@@ -1,10 +1,14 @@
-from Tkinter import *
+try:
+    from tkinter import *
+except ImportError:
+    from Tkinter import *
 from time import sleep
-from Air import Pump
+#from Air import Pump
 
 class Window(Frame):
     inflate = False
-    pump = Pump(1, 50)
+    #pump = Pump(1, 50)
+    valuelist = [50, 75, 100, 125, 150, 175, 200]
 
     def __init__(self, master=None):
         Frame.__init__(self, master)     
@@ -15,12 +19,16 @@ class Window(Frame):
 
         # create button, link it to clickExitButton()
         inflateButton = Button(self, text="Inflate", command=self.setInflate, bg="firebrick", fg="white")
-        w = Scale(self.master, from_=50, to=100, orient=HORIZONTAL)
+        w = Scale(self.master, from_=50, to=200, orient=HORIZONTAL, command=self.valuecheck)
         w.pack()
         self.slider = w
 
         # place button at centre
-        inflateButton.place(x=80, y=50, height=100, width=160)
+        inflateButton.place(x=350, y=160, height=100, width=160)
+
+    def valuecheck(self, value):
+        newvalue = min(self.valuelist, key=lambda x:abs(x-float(value)))
+        self.slider.set(newvalue)
 
     def clickExitButton(self):
         exit()
