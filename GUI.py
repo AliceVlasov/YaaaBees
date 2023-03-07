@@ -13,18 +13,19 @@ class Window(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)     
         self.master = master
+        self.master.configure(background="white")
         
         # widget can take all window
         self.pack(fill=BOTH, expand=1)
 
-        # create button, link it to clickExitButton()
+        # create the button and the scale, link it to clickExitButton()
         inflateButton = Button(self, text="Inflate", command=self.setInflate, bg="firebrick", fg="white")
-        w = Scale(self.master, from_=50, to=200, orient=HORIZONTAL, command=self.valuecheck)
-        w.pack()
-        self.slider = w
+        scale = Scale(self.master, cursor="dot", from_=50, to=200, orient=HORIZONTAL, command=self.valuecheck, tickinterval=50)
+        self.slider = scale
 
         # place button at centre
         inflateButton.place(x=350, y=160, height=100, width=160)
+        scale.place(x=350, y=260, height=100, width=160)
 
     def valuecheck(self, value):
         newvalue = min(self.valuelist, key=lambda x:abs(x-float(value)))
