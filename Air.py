@@ -58,3 +58,10 @@ class Valve:
         sleep(seconds)
         self.open()
     
+class Sensor:
+    def __init__(self, id):
+        self.id = id
+        self.val = 0 # GET value from Sensor.
+
+    def updateVal(self, val):
+        self.value = val
