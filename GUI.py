@@ -17,8 +17,8 @@ class Window(Frame):
         Frame.__init__(self, master)     
         self.master = master
         self.master.wm_title("Tkinter button")
-        #self.master.attributes("-fullscreen", True)
-        self.master.geometry("800x480")
+        self.master.attributes("-fullscreen", True)
+        #self.master.geometry("800x480")
         self.master.resizable(False, False)
 
         # widget can take all window
