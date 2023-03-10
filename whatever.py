@@ -9,13 +9,13 @@ silicone_valve = Silicone_valve(3, "silicone_valve")
 # inflating
 pump_valve.open_inflate()
 pump_inflate.run()
-sleep(5)
+sleep(3)
 pump_inflate.stop()
 
 #deflating
 pump_valve.open_deflate()
 pump_deflate.run()
-sleep(5)
+sleep(3)
 pump_deflate.stop()
 
 sleep(2)
