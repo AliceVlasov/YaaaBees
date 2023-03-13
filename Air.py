@@ -34,29 +34,40 @@ class Pump:
         sleep(seconds)
         self.stop()
 
-class Valve:
-    def __init__(self, id):
+class Pump_valve:
+    """
+        This is a valve that controls whether the output is inflating/deflating
+        by connecting the pumps.
+    """
+    def __init__(self, id, name):
         self.id = id # location on the motorboard
         self.speed = 100 # need this to be 100 or the valve won't close
-        self.close()
+        self.name = name
     
-    def open(self):
-        print("opening valve {}".format(self.id))
+    def open_deflate(self):
+        print("opening valve {}".format(self.name))
         mc.stop_motor(self.id)
 
-    def open_for(self, seconds):
-        self.open()
-        sleep(seconds)
-        self.close()
+    def open_inflate(self):
+        print("closing valve {}".format(self.name))
+        mc.move_motor(self.id, self.speed)
+
+class Silicone_valve:
+    """
+        This is a valve that retains air in a silicone pouch or allows air in/out.
+    """
+    def __init__(self, id, name):
+        self.id = id # location on the motorboard
+        self.speed = 100 # need this to be 100 or the valve won't close
+        self.name = name
+    
+    def open(self):
+        print("opening valve {}".format(self.name))
+        mc.stop_motor(self.id)
 
     def close(self):
-        print("closing valve {}".format(self.id))
+        print("closing valve {}".format(self.name))
         mc.move_motor(self.id, self.speed)
-    
-    def close_for(self, seconds):
-        self.close()
-        sleep(seconds)
-        self.open()
     
 class Sensor:
     def __init__(self, id):
