@@ -13,6 +13,10 @@ class Window(Frame):
     valuelist = [50, 75, 100, 125, 150, 175, 200]
 
     def __init__(self, master=None):
+        #setup controller for hardware
+        self.controller = Controller()
+        self.pouch_name = "cube"
+        
         Frame.__init__(self, master)     
         self.master = master
         self.master.wm_title("Tkinter button")
@@ -39,10 +43,6 @@ class Window(Frame):
         scale.place(x=350, y=260, height=75, width=160)
         print("wadsd")
         self.master.mainloop()
-
-        #setup controller for hardware
-        self.controller = Controller()
-        self.pouch_name = "cube"
 
     def valuecheck(self, value):
         newvalue = min(self.valuelist, key=lambda x:abs(x-float(value)))

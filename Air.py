@@ -61,12 +61,12 @@ class Silicone_valve:
         self.speed = 100 # need this to be 100 or the valve won't close
         self.name = name
     
-    def open(self):
-        print("opening valve {}".format(self.name))
-        mc.stop_motor(self.id)
-
     def close(self):
         print("closing valve {}".format(self.name))
+        mc.stop_motor(self.id)
+
+    def open(self):
+        print("opening valve {}".format(self.name))
         mc.move_motor(self.id, self.speed)
     
 class Sensor:

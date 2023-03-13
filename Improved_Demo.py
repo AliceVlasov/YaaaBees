@@ -6,7 +6,7 @@ controller = Controller()
 
 #inflating
 controller.inflate_pouch("cube")
-sleep(3)
+sleep(5)
 controller.stop_inflate()
 
 #deflating

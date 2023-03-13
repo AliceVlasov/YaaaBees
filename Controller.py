@@ -13,7 +13,7 @@ class Pouch:
         self.name = name
         self.inflate_speed = inflate_speed
         self.deflate_speed = deflate_speed
-        self.valve = Silicone_valve(valve_id)
+        self.valve = Silicone_valve(valve_id, name+" valve")
 
         # make sure valve is closed by default
         self.close_valve()
@@ -30,7 +30,7 @@ class Controller:
         self.deflate_pump = Pump(_DEFLATE_PUMP_PORT, 0)
         self.pump_valve = Pump_valve(_PUMP_VALVE_PORT, "pump_valve")
         self.pouches = {
-            'cube':         Pouch("cube", 80, 80, 3),
+            'cube':         Pouch("cube", 125, 70, 3),
             'thick_sleeve': Pouch("thick_sleeve", 100, 80, 3)
         }
     
@@ -60,8 +60,8 @@ class Controller:
         self.deflating_pouch = self.pouches.get(pouch_name)
 
         # open correct valves
-        self.pump_valve.open_inflate()
-        self.deflate_pump.set_speed(self.inflating_pouch.inflate_speed)
+        self.pump_valve.open_deflate()
+        self.deflate_pump.set_speed(self.deflating_pouch.deflate_speed)
         self.deflate_pump.run()
         self.deflating_pouch.open_valve()
     
