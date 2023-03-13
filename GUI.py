@@ -38,7 +38,6 @@ class Window(Frame):
         inflateButton.place(x=440, y=340, height=60, width=60)
         deflateButton.place(x=500, y=340, height=60, width=60)
         scale.place(x=350, y=260, height=75, width=160)
-        print("wadsd")
         self.master.mainloop()
 
     def valuecheck(self, value):
