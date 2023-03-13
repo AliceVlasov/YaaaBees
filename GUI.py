@@ -9,22 +9,22 @@ from Air import Pump
 class Window(Frame):
     inflate = False
     deflate = False
-    pump = Pump(1, 100)
-    depump = Pump(2,100)
+    pump = Pump(4, 100)
+    depump = Pump(5,100)
     valuelist = [50, 75, 100, 125, 150, 175, 200]
 
     def __init__(self, master=None):
         Frame.__init__(self, master)     
         self.master = master
         self.master.wm_title("Tkinter button")
-        self.master.attributes("-fullscreen", True)
-        #self.master.geometry("800x480")
+        #self.master.attributes("-fullscreen", True)
+        self.master.geometry("800x480")
         self.master.resizable(False, False)
 
         # widget can take all window
         self.pack(fill=BOTH, expand=1)
 
-        img= ImageTk.PhotoImage(Image.open("media\\body.png"))
+        img= ImageTk.PhotoImage(Image.open("media/body.png"))
         lab = Label(self.master, image=img)
         lab.pack()
         lab.place(x=0, y=0, relwidth=1, relheight=1)
@@ -33,12 +33,12 @@ class Window(Frame):
         inflateButton = Button(self.master, text="Inflate", command=self.setInflate, bg="firebrick", fg="white")
         deflateButton = Button(self.master, text="Deflate", command=self.setDeflate, bg="firebrick", fg="white")
         scale = Scale(self.master, cursor="dot", from_=50, to=200, orient=HORIZONTAL, command=self.valuecheck, tickinterval=50)
-        self.slider = 100 #scale
+        self.slider = scale
 
         inflateButton.place(x=440, y=340, height=60, width=60)
         deflateButton.place(x=500, y=340, height=60, width=60)
-        #scale.place(x=350, y=260, height=75, width=160)
-
+        scale.place(x=350, y=260, height=75, width=160)
+        print("wadsd")
         self.master.mainloop()
 
     def valuecheck(self, value):

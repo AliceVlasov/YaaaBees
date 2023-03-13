@@ -22,3 +22,5 @@ sleep(2)
 
 pump_valve.open_deflate()
 
+#pump.set_speed(50)
+

@@ -4,10 +4,10 @@ This is the API to interact with the air pump and valve(s) through a motorboard.
 This includes starting and stopping an air pump, setting and changing the air pump power, and opening and closing the valve(s)
 
 """
-#from motors import Motors
+from motors3 import Motors
 from time import sleep
 
-mc = "" # Motors()
+mc = Motors()
 
 class Pump:
     def __init__(self, id, speed):
