@@ -5,13 +5,13 @@ from Controller import Controller
 controller = Controller()
 
 #inflating
-controller.inflate_pouch("cube")
-sleep(5)
+controller.inflate_pouch("thiccc thigh")
+sleep(6)
 controller.stop_inflate()
 
 #deflating
-controller.deflate_pouch("cube")
-sleep(3)
+controller.deflate_pouch("thiccc thigh")
+sleep(2)
 controller.stop_deflate()
 
 #cleanup

@@ -35,13 +35,13 @@ class Window(Frame):
         # create the button and the scale, link it to clickExitButton()
         inflateButton = Button(self.master, text="Inflate", command=self.setInflate, bg="firebrick", fg="white")
         deflateButton = Button(self.master, text="Deflate", command=self.setDeflate, bg="firebrick", fg="white")
-        scale = Scale(self.master, cursor="dot", from_=50, to=200, orient=HORIZONTAL, command=self.valuecheck, tickinterval=50)
-        self.slider = scale
+        #scale = Scale(self.master, cursor="dot", from_=50, to=200, orient=HORIZONTAL, command=self.valuecheck, tickinterval=50)
+        #self.slider = scale
 
         inflateButton.place(x=440, y=340, height=60, width=60)
         deflateButton.place(x=500, y=340, height=60, width=60)
-        scale.place(x=350, y=260, height=75, width=160)
-        print("wadsd")
+        #scale.place(x=350, y=260, height=75, width=160)
+
         self.master.mainloop()
 
     def valuecheck(self, value):
