@@ -9,9 +9,8 @@ _DEFLATE_PUMP_PORT = 5
 _PUMP_VALVE_PORT = 2
 
 class Pouch:
-    def __init__(self, name: str, id: int, inflate_speed: int, deflate_speed: int, valve_id: int):
+    def __init__(self, name: str, inflate_speed: int, deflate_speed: int, valve_id: int):
         self.name = name
-        self.id = id
         self.inflate_speed = inflate_speed
         self.deflate_speed = deflate_speed
         self.valve = Silicone_valve(valve_id)
@@ -31,8 +30,8 @@ class Controller:
         self.deflate_pump = Pump(_DEFLATE_PUMP_PORT, 0)
         self.pump_valve = Pump_valve(_PUMP_VALVE_PORT, "pump_valve")
         self.pouches = {
-            'cube': Pouch("cube", 1, 80, 80, 3),
-            'thick_sleeve': Pouch("thick_sleeve", 2, 100, 80, 3)
+            'cube':         Pouch("cube", 80, 80, 3),
+            'thick_sleeve': Pouch("thick_sleeve", 100, 80, 3)
         }
     
     def inflate_pouch(self, pouch_name:str):
@@ -70,3 +69,9 @@ class Controller:
         self.deflating_pouch.close_valve()
         self.deflating_pouch = None
         self.deflate_pump.stop()
+    
+    def cleanup(self):
+        """
+            Make sure all valves are in neutral position before shutting off
+        """
+        self.pump_valve.open_deflate()
