@@ -9,7 +9,3 @@ root = Tk()
 
 app = Window(root)
 app.cleanup()
-#root.wm_title("Tkinter button")
-#root.attributes("-fullscreen", True)
-#root.resizable(False, False)
-#root.mainloop()
