@@ -9,7 +9,8 @@ from time import sleep
 
 _TESTING = True
 
-mc = Motors()
+if not _TESTING:
+    mc = Motors()
 
 class Pump:
     def __init__(self, id, speed):

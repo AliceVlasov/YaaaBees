@@ -12,7 +12,7 @@ _DEFLATE_PUMP_PORT = 5
 _PUMP_VALVE_PORT = 2
 
 class Controller:
-    def __init__(self, gui_safety_stop: Callable[[str], None]):
+    def __init__(self, gui_safety_stop: Callable[[], None]):
         """
             Initialise a new mannequin Controller
 
@@ -22,12 +22,12 @@ class Controller:
         self.deflate_pump = Pump(_DEFLATE_PUMP_PORT, 0)
         self.pump_valve = Pump_valve(_PUMP_VALVE_PORT, "pump_valve")
         self.pouches = {
-            'cube':            Pouch("cube", 100,100, 3),
-            'thick sleeve':    Pouch("thick_sleeve", 100, 80, 3),
-            'cylinder':        Pouch("cylinder", 50, 50, 3),
-            'cylinder sleeve': Pouch("cylinder_sleeve", 75, 60, 3),
-            'thiccc_thigh':    Pouch("thiccc_thigh", 100, 60, 3),
-            'calf':            Pouch("calf", 60, 60, 1),
+            'cube':            Pouch("cube", 100, 100, 5, 3),
+            'thick sleeve':    Pouch("thick_sleeve", 100, 80, 4, 3),
+            'cylinder':        Pouch("cylinder", 50, 50, 2, 3),
+            'cylinder sleeve': Pouch("cylinder_sleeve", 75, 60, 7, 3),
+            'thiccc_thigh':    Pouch("thiccc_thigh", 100, 60, 1, 3),
+            'calf':            Pouch("calf", 60, 60, 3, 1),
         }
 
         # for monitoring which pouches are inflating/deflating
@@ -38,6 +38,10 @@ class Controller:
 
         self.gui_safety_stop = gui_safety_stop # function to call to emergency override the UI
     
+    def get_pouch(self, pouch_name:str) -> Pouch:
+        if pouch_name in self.pouches:
+            return self.pouches[pouch_name]
+
     def can_start_pump(self) -> bool:
         """
             :return whether any pouches are currently being inflated or deflated
@@ -60,14 +64,16 @@ class Controller:
             :param pouch_name: the name of the pouch that should be inflated
             :return: whether inflating was activated successfully or not 
         """
-        if str(pouch_name) not in self.pouches:
+        pouch = self.get_pouch(pouch_name)
+
+        if not pouch:
             print("Invalid pouch id:", pouch_name)
             return False
         
         if not self.can_start_pump():
             return False
         
-        self.inflating_pouch = self.pouches.get(pouch_name)
+        self.inflating_pouch = pouch
 
         # open correct valves
         self.pump_valve.open_inflate()
@@ -113,14 +119,16 @@ class Controller:
             :param pouch_name: the name of the pouch that should be deflated
             :return: whether deflating was activated successfully or not 
         """
-        if str(pouch_name) not in self.pouches:
+        pouch = self.get_pouch(pouch_name)
+
+        if not pouch:
             print("Invalid pouch id:", pouch_name)
             return False
 
         if not self.can_start_pump():
             return False
 
-        self.deflating_pouch = self.pouches.get(pouch_name)
+        self.deflating_pouch = pouch
 
         # open correct valves
         self.pump_valve.open_deflate()
@@ -198,7 +206,7 @@ class Controller:
 
         self.gui_safety_stop()
     
-    def reset_pouch(self, pouch: Pouch) -> bool:
+    def reset_pouch(self, pouch: Pouch) -> None:
         """
             Deflates/Inflates the given pouch until it is in a neutral position (inflate status 0)
 
