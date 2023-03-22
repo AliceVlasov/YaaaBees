@@ -87,26 +87,25 @@ class Window(Frame):
 
         if self.inflate:
             success = self.controller.inflate_pouch(self.pouch_name)
-            if success:
-                self.inflate = not self.inflate
-                print("Inflating: " + str(self.inflate))
         else:
-            self.controller.stop_inflate()
+            success = self.controller.stop_inflate()
+        
+        if success:
+            self.inflate = not self.inflate
 
     # Deflates the pouch.
     def setDeflate(self):
         assert (not self.inflate)
 
-
         if self.deflate:
             success = self.controller.deflate_pouch(self.pouch_name)
-            if success:
-                self.deflate = not self.deflate
-                print("Deflating: " + str(self.inflate))
         else:
-            self.controller.stop_deflate()
+            success = self.controller.stop_deflate()
+        
+        if success:
+            self.deflate = not self.deflate
     
-    def safetyStop(self, message:str):
+    def safetyStop(self):
         #TODO for enes: here we can trigger a popup to display for a few seconds saying something like "pouch inflated/deflated to maximum", depending on whether inflate is true or false
         if self.inflate:
             pass
