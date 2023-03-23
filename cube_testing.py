@@ -6,15 +6,9 @@ inflate_time = 3
 
 controller = Cube_Controller()
 controller.stop_inflate()
+sleep(inflate_time)
 controller.stop_deflate()
-controller.inflate_to_size(6)
-sleep(10)
-controller.inflate_to_size(5)
-sleep(10)
-controller.inflate_to_size(4)
-sleep(10)
-controller.inflate_to_size(3)
-sleep(10)
+
 
 
 controller.reset_pouch()
