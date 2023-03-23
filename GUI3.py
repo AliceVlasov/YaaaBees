@@ -14,7 +14,7 @@ class Window(Frame):
 
     def __init__(self, master=None):
         # Setup controller for hardware
-        self.controller = Controller(self.safetyStop)
+        self.controller = Controller()
         self.pouch_name = "cube"
         self.selected = IntVar()
         self.slider = {
@@ -22,12 +22,8 @@ class Window(Frame):
             "left thigh": 1
         }
         self.pouches = {
-            0: "cube",
             1: "left leg",
             2: "left thigh",
-            3: "thick sleeve",
-            4: "cylinder sleeve",
-            5: "thiccc thigh"
         }
 
         # Window settings 
@@ -50,8 +46,8 @@ class Window(Frame):
         lab.place(x=0, y=-40, relwidth=1, relheight=1)
 
         # Create the inflate/deflate buttons.
-        inflateButton = Button(self.master, text="Inflate", command=self.setInflate, bg="firebrick", fg="white")
-        deflateButton = Button(self.master, text="Deflate", command=self.setDeflate, bg="firebrick", fg="white")
+        inflateButton = Button(self.master, text="Activate", command=self.setInflate, bg="firebrick", fg="white")
+        deflateButton = Button(self.master, text="Reset", command=self.setDeflate, bg="white", fg="black")
         self.disableButton(deflateButton)
 
         # Create the pouch selection buttons. 
@@ -110,36 +106,26 @@ class Window(Frame):
         # Ensure that we aren't deflating already.
         print(self.slider)
         assert (not self.deflate)
+        self.inflate = not self.inflate
+        print("Inflating: " + str(self.inflate))
 
-        if not self.inflate:
-            success = self.controller.inflate_pouch(self.pouch_name)
+        if self.inflate:
+            self.controller.inflate_pouch(self.pouch_name)
         else:
-            success = self.controller.stop_inflate()
-        
-        if success:
-            self.inflate = not self.inflate
+            self.controller.stop_inflate()
 
     # Deflates the pouch.
     def setDeflate(self):
         # Ensure that we aren't inflating already.
         assert (not self.inflate)
+        self.deflate = not self.deflate
 
-        if not self.deflate:
-            success = self.controller.deflate_pouch(self.pouch_name)
+        print("Deflating: " + str(self.inflate))
+
+        if self.deflate:
+            self.controller.deflate_pouch(self.pouch_name)
         else:
-            success = self.controller.stop_deflate()
-        
-        if success:
-            self.deflate = not self.deflate
-    
-    def safetyStop(self):
-        #TODO for enes: here we can trigger a popup to display for a few seconds saying something like "pouch inflated/deflated to maximum", depending on whether inflate is true or false
-        if self.inflate:
-            self.inflate = not self.inflate
-        elif self.deflate:
-            self.deflate = not self.deflate
-        else:
-            print("Error: safety stop triggered when no pouch is inflating or deflating!")
+            self.controller.stop_deflate()
     
     def cleanup(self):
         """
