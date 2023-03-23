@@ -66,7 +66,13 @@ class Safe_Controller:
 
         print("Stopped deflating {}".format(pouch.name))
         
-    def reset_pouch(self, pouch: Pouch):
+    def reset_pouch(self, pouch_name: str):
+        pouch = self.get_pouch(pouch_name)
+
+        if not pouch:
+            print("invalid pouch name")
+            return
+
         print("Resetting pouch {}".format(pouch.name))
 
         deflate_time = pouch.get_deflate_left()
@@ -91,7 +97,7 @@ class Safe_Controller:
             print("Invalid pouch name:", pouch_name)
             return False 
 
-        self.reset_pouch(pouch)
+        self.reset_pouch(pouch_name)
 
         inflate_time = pouch.get_inflate_time_for_size(size)
 
