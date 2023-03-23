@@ -19,7 +19,9 @@ class Cube_Controller:
         self.inflate_pump = Pump(_INFLATE_PUMP_PORT, 0)
         self.deflate_pump = Pump(_DEFLATE_PUMP_PORT, 0)
         self.pump_valve = Pump_valve(_PUMP_VALVE_PORT, "pump_valve")
-        self.cube = Pressure_Pouch("cube", 100, 80, [3,4,5,6], [0,2,4,6], 3)
+        self.cube = Pressure_Pouch("cube", 100, 80, [3,4,5,6], [966, 969, 974, 986], 3)
+        
+        self.reset_pouch()
     
     def start_deflate(self):
         self.pump_valve.open_deflate()
@@ -68,7 +70,7 @@ class Cube_Controller:
         self.stop_inflate()
         
     
-    def inflate_pouch_to_size(self, size:int) -> bool:
+    def inflate_to_size(self, size:int) -> bool:
         """
             Inflates pouch with the given name to a specific size
 

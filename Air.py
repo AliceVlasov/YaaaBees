@@ -127,7 +127,19 @@ class Pressure_Pouch(Pouch):
             :param pressures: list of pressures (mBar) needed for the pouch to inflate to each size in sizes 
             :param valve_id: the port motorboard port number for the valve controlling air inside the pouch
         """
-        super.__init__(name, inflate_speed, deflate_speed, sizes, [0 for _ in range(len(sizes))], valve_id)
+        self.name = name
+        self.inflate_speed = inflate_speed
+        self.deflate_speed = deflate_speed
+
+        self.valve = Silicone_valve(valve_id, name+" valve")
+
+        sorted_sizes = sorted(sizes)
+        self.size_range = (sorted_sizes[0], sorted_sizes[-1])
+
+        self.inflate_status = 0 # pouch starts neutral
+
+        # make sure valve is closed by default
+        self.close_valve()
 
         self.pressure_sizes = dict()
         for (s,p) in list(zip(sizes, pressures)):
