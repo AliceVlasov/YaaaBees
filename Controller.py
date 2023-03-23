@@ -23,11 +23,11 @@ class Controller:
         self.pump_valve = Pump_valve(_PUMP_VALVE_PORT, "pump_valve")
         self.pouches = {
             'cube':            Pouch("cube", 100, 100, 5, 3),
-            'thick sleeve':    Pouch("thick_sleeve", 100, 80, 4, 3),
-            'cylinder':        Pouch("cylinder", 50, 50, 2, 3),
-            'cylinder sleeve': Pouch("cylinder_sleeve", 75, 60, 7, 3),
+            'thick_sleeve':    Pouch("thick_sleeve", 100, 80, 4, 3),
+            'left_thigh':      Pouch("left_thigh", 50, 50, 2, 3),
+            'cylinder_sleeve': Pouch("cylinder_sleeve", 75, 60, 7, 3),
             'thiccc_thigh':    Pouch("thiccc_thigh", 100, 60, 1, 3),
-            'calf':            Pouch("calf", 60, 60, 3, 1),
+            'left_leg':        Pouch("left_leg", 60, 60, 3, 1),
         }
 
         # for monitoring which pouches are inflating/deflating
@@ -66,11 +66,11 @@ class Controller:
         """
         pouch = self.get_pouch(pouch_name)
 
-        if not pouch:
+        if pouch == None:
             print("Invalid pouch id:", pouch_name)
             return False
         
-        if not self.can_start_pump():
+        if self.can_start_pump() == None:
             print("cannot start pumping")
             return False
         
@@ -94,7 +94,7 @@ class Controller:
 
             :return: whether anything stopped inflating
         """
-        if not self.inflating_pouch:
+        if self.inflating_pouch == None:
             print("No pouch inflating")
             return False
         
@@ -122,7 +122,7 @@ class Controller:
         """
         pouch = self.get_pouch(pouch_name)
 
-        if not pouch:
+        if pouch == None:
             print("Invalid pouch id:", pouch_name)
             return False
 
@@ -151,7 +151,7 @@ class Controller:
 
             :return: whether anything stopped deflating
         """
-        if not self.deflating_pouch:
+        if self.deflating_pouch == None:
             print("No pouch deflating")
             return False
 
@@ -199,10 +199,10 @@ class Controller:
             Function called by the Timer when time has run out and the pouch should no longer be 
             inflated/deflated any further
         """
-        if self.inflating_pouch:
+        if self.inflating_pouch != None:
             print("Emergency stop inflating")
             self.stop_inflate()
-        elif self.deflating_pouch:
+        elif self.deflating_pouch != None:
             print("Emergency stop deflating")
             self.stop_deflate()
         else:  # emergency stop was triggered when nothing is being
