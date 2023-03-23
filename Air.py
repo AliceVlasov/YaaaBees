@@ -7,7 +7,7 @@ This includes starting and stopping an air pump, setting and changing the air pu
 from motors3 import Motors
 from time import sleep
 
-_TESTING = True
+_TESTING = False
 
 if not _TESTING:
     mc = Motors()
@@ -75,6 +75,7 @@ class Pouch:
 
             :param time_inflated: the amount of time this pouch has been inflating so far, if deflating, this should be negative
         """
+        print("increased pouch {0}'s inflate status by {1}".format(self.name, time_inflated))
         self.inflate_status += time_inflated
     
     def open_valve(self):

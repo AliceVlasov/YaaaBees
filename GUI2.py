@@ -14,7 +14,7 @@ class Window(Frame):
 
     def __init__(self, master=None):
         # Setup controller for hardware
-        self.controller = Controller()
+        self.controller = Controller(self.safetyStop)
         self.pouch_name = "cube"
         self.selected = IntVar()
         self.pouches = {
@@ -88,7 +88,7 @@ class Window(Frame):
     def setInflate(self):
         assert (not self.deflate)
 
-        if self.inflate:
+        if not self.inflate:
             success = self.controller.inflate_pouch(self.pouch_name)
         else:
             success = self.controller.stop_inflate()
@@ -100,7 +100,7 @@ class Window(Frame):
     def setDeflate(self):
         assert (not self.inflate)
 
-        if self.deflate:
+        if not self.deflate:
             success = self.controller.deflate_pouch(self.pouch_name)
         else:
             success = self.controller.stop_deflate()
@@ -111,9 +111,9 @@ class Window(Frame):
     def safetyStop(self):
         #TODO for enes: here we can trigger a popup to display for a few seconds saying something like "pouch inflated/deflated to maximum", depending on whether inflate is true or false
         if self.inflate:
-            pass
+            self.inflate = not self.inflate
         elif self.deflate:
-            pass
+            self.deflate = not self.deflate
         else:
             print("Error: safety stop triggered when no pouch is inflating or deflating!")
     

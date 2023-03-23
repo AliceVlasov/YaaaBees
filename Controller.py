@@ -71,6 +71,7 @@ class Controller:
             return False
         
         if not self.can_start_pump():
+            print("cannot start pumping")
             return False
         
         self.inflating_pouch = pouch
@@ -126,6 +127,7 @@ class Controller:
             return False
 
         if not self.can_start_pump():
+            print("Cannot start deflating")
             return False
 
         self.deflating_pouch = pouch
@@ -176,6 +178,7 @@ class Controller:
         self.timer = Timer(max_time, self.emergency_stop_pumps)
         self.timer.start()
         self.start_time = time()
+        print("started timer for {} seconds".format(max_time))
     
     def stop_timer(self) -> float:
         """
@@ -187,6 +190,8 @@ class Controller:
         if self.timer:
             self.timer.cancel()
             self.time = None
+        
+        print("stopped timer after {} seconds".format(time_elapsed))
         return time_elapsed
 
     def emergency_stop_pumps(self) -> None:
@@ -206,34 +211,47 @@ class Controller:
 
         self.gui_safety_stop()
     
-    def reset_pouch(self, pouch: Pouch) -> None:
+    def reset_pouch(self, pouch_name: str) -> bool:
         """
             Deflates/Inflates the given pouch until it is in a neutral position (inflate status 0)
 
             :param pouch: the Pouch that needs to be reset
+            :return: whether the pouch was reset successfully
         """
+        pouch = self.get_pouch(pouch_name)
+        if not pouch:
+            print("invalid pouch to reset")
+            return False
+        
+        print("resetting pouch {}".format(pouch_name))
+        
         time_left = pouch.inflate_status
         if time_left > 0:
+            print("deflating for reset")
             self.deflate_pouch(pouch.name)
             sleep(time_left)
             self.stop_deflate()
         else:
+            print("inflating for reset")
             self.inflate_pouch(pouch.name)
             sleep(-time_left)
             self.stop_inflate()
         
         pouch.inflate_status = 0
+        return True
     
     def cleanup(self):
         """
             Make sure all the pouches and pumps are reset and valves are in 
             neutral position before shutting off
         """
+        print("Cleaning up")
         self.stop_inflate()
         self.stop_deflate()
 
-        for (_, pouch) in self.pouches:
-           self.reset_pouch(pouch) 
+        for pouch_name in self.pouches:
+           pouch = self.get_pouch(pouch_name)
+           self.reset_pouch(pouch_name) 
            pouch.reset_valve()
 
         self.pump_valve.reset()
