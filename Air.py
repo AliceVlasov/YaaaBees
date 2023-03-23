@@ -6,8 +6,12 @@ This includes starting and stopping an air pump, setting and changing the air pu
 """
 from motors3 import Motors
 from time import sleep
+from typing import List, Tuple
 
-mc = Motors()
+_TESTING = False
+
+if not _TESTING:
+    mc = Motors()
 
 class Pump:
     def __init__(self, id, speed):
@@ -19,20 +23,96 @@ class Pump:
 
     def run(self):
         print("starting pump {}".format(self.id))
-        mc.move_motor(self.id, self.speed)
+        if not _TESTING:
+            mc.move_motor(self.id, self.speed)
 
     def runWithSpeed(self, speed):
         print("starting pump {}".format(self.id))
-        mc.move_motor(self.id, speed)
+        if not _TESTING:
+            mc.move_motor(self.id, speed)
 
     def stop(self):
         print("stopping pump {}".format(self.id))
-        mc.stop_motor(self.id)
+        if not _TESTING:
+            mc.stop_motor(self.id)
         
     def run_for(self, seconds):
         self.run()
         sleep(seconds)
         self.stop()
+
+class Pouch:
+    def __init__(self, name: str, inflate_speed: int, deflate_speed: int, sizes: List[int], times: List[float], valve_id: int):
+        """
+            Initialise a new Silicone Pouch
+
+            :param name: a unique name to identify the pouch
+            :param inflate_speed: pump speed for inflating
+            :param deflate_speed: pump speed for deflating
+            :param sizes: list of sizes (cm) that the pouch can achieve 
+            :param times: list of times (s) needed for the pouch to inflate to each size in sizes 
+            :param valve_id: the port motorboard port number for the valve controlling air inside the pouch
+        """
+        self.name = name
+        self.inflate_speed = inflate_speed
+        self.deflate_speed = deflate_speed
+
+        self.valve = Silicone_valve(valve_id, name+" valve")
+
+        self.sizes = dict()
+        for (s,t) in list(zip(sizes, times)):
+            self.sizes[str(s)] = t
+
+        sorted_sizes = sorted(sizes)
+        self.size_range = (sorted_sizes[0], sorted_sizes[-1])
+
+        self.inflate_status = 0 # pouch starts neutral
+
+        # make sure valve is closed by default
+        self.close_valve()
+    
+    def get_deflate_needed(self):
+        return self.inflate_status
+    
+    def get_inflate_time_for_size(self, size: int):
+        """
+            Returns the number of seconds needed for the pouch to inflate to the given size. If that size is not specified for this pouch, -1 is returned
+        
+            :param size: the size (cm) setting for this pouch
+        """
+        if str(size) not in self.size:
+            return -1
+
+        return self.size[str(size)]
+        
+    
+    def update_inflate_status(self, time_inflated: float) -> None:
+        """
+            Updates the net amount of time the pouch has spend inflating
+
+            :param time_inflated: the amount of time this pouch has been inflating so far, if deflating, this should be negative
+        """
+        print("increased pouch {0}'s inflate status by {1}".format(self.name, time_inflated))
+        self.inflate_status += time_inflated
+    
+    def reset_inflate_status(self):
+        print("reset pouch {}'s inflate status to 0".format(self.name))
+        self.inflate_status = 0
+    
+    def get_size_range(self) -> Tuple[int,int]:
+        """
+            :return: tuple with the maximum and minimum sizes (cm) that the pouch can achieve
+        """
+        return self.size_range
+    
+    def open_valve(self):
+        self.valve.open()
+    
+    def close_valve(self):
+        self.valve.close()
+    
+    def reset_valve(self):
+        self.valve.reset()
 
 class Pump_valve:
     """
@@ -46,11 +126,16 @@ class Pump_valve:
     
     def open_deflate(self):
         print("opening valve {}".format(self.name))
-        mc.stop_motor(self.id)
+        if not _TESTING:
+            mc.stop_motor(self.id)
 
     def open_inflate(self):
         print("closing valve {}".format(self.name))
-        mc.move_motor(self.id, self.speed)
+        if not _TESTING:
+            mc.move_motor(self.id, self.speed)
+    
+    def reset(self):
+        self.open_deflate()
 
 class Silicone_valve:
     """
@@ -63,16 +148,13 @@ class Silicone_valve:
     
     def close(self):
         print("closing valve {}".format(self.name))
-        mc.stop_motor(self.id)
+        if not _TESTING:
+            mc.stop_motor(self.id)
 
     def open(self):
         print("opening valve {}".format(self.name))
-        mc.move_motor(self.id, self.speed)
+        if not _TESTING:
+            mc.move_motor(self.id, self.speed)
     
-class Sensor:
-    def __init__(self, id):
-        self.id = id
-        self.val = 0 # GET value from Sensor.
-
-    def updateVal(self, val):
-        self.value = val
+    def reset(self):
+        self.close()

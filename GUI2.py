@@ -14,7 +14,7 @@ class Window(Frame):
 
     def __init__(self, master=None):
         # Setup controller for hardware
-        self.controller = Controller()
+        self.controller = Controller(self.safetyStop)
         self.pouch_name = "cube"
         self.selected = IntVar()
         self.slider = {
@@ -110,26 +110,36 @@ class Window(Frame):
         # Ensure that we aren't deflating already.
         print(self.slider)
         assert (not self.deflate)
-        self.inflate = not self.inflate
-        print("Inflating: " + str(self.inflate))
 
-        if self.inflate:
-            self.controller.inflate_pouch(self.pouch_name)
+        if not self.inflate:
+            success = self.controller.inflate_pouch(self.pouch_name)
         else:
-            self.controller.stop_inflate()
+            success = self.controller.stop_inflate()
+        
+        if success:
+            self.inflate = not self.inflate
 
     # Deflates the pouch.
     def setDeflate(self):
         # Ensure that we aren't inflating already.
         assert (not self.inflate)
-        self.deflate = not self.deflate
 
-        print("Deflating: " + str(self.inflate))
-
-        if self.deflate:
-            self.controller.deflate_pouch(self.pouch_name)
+        if not self.deflate:
+            success = self.controller.deflate_pouch(self.pouch_name)
         else:
-            self.controller.stop_deflate()
+            success = self.controller.stop_deflate()
+        
+        if success:
+            self.deflate = not self.deflate
+    
+    def safetyStop(self):
+        #TODO for enes: here we can trigger a popup to display for a few seconds saying something like "pouch inflated/deflated to maximum", depending on whether inflate is true or false
+        if self.inflate:
+            self.inflate = not self.inflate
+        elif self.deflate:
+            self.deflate = not self.deflate
+        else:
+            print("Error: safety stop triggered when no pouch is inflating or deflating!")
     
     def cleanup(self):
         """
