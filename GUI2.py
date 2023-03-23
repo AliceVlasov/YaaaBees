@@ -20,10 +20,10 @@ class Window(Frame):
         self.pouches = {
             0: "cube",
             1: "left_leg",
-            2: "left_thight",
-            3: "thick+sleeve",
+            2: "left_thigh",
+            3: "thick_sleeve",
             4: "cylinder_sleeve",
-            5: "thiccc thigh"
+            5: "thiccc_thigh"
         }
         
         # Window settings 
