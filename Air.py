@@ -7,6 +7,7 @@ This includes starting and stopping an air pump, setting and changing the air pu
 from motors3 import Motors
 from time import sleep
 from typing import List, Tuple
+from sensor import Pressure_Sensor
 
 _TESTING = False
 
@@ -80,7 +81,7 @@ class Pouch:
         
             :param size: the size (cm) setting for this pouch
         """
-        if str(size) not in self.size:
+        if str(size) not in self.sizes:
             return -1
 
         return self.size[str(size)]
@@ -113,6 +114,50 @@ class Pouch:
     
     def reset_valve(self):
         self.valve.reset()
+
+class Pressure_Pouch(Pouch):
+    def __init__(self, name: str, inflate_speed: int, deflate_speed: int, sizes: List[int], pressures: List[float], valve_id: int):
+        """
+            Initialise a new Silicone Pouch
+
+            :param name: a unique name to identify the pouch
+            :param inflate_speed: pump speed for inflating
+            :param deflate_speed: pump speed for deflating
+            :param sizes: list of sizes (cm) that the pouch can achieve starting with the neutral size
+            :param pressures: list of pressures (mBar) needed for the pouch to inflate to each size in sizes 
+            :param valve_id: the port motorboard port number for the valve controlling air inside the pouch
+        """
+        super.__init__(name, inflate_speed, deflate_speed, sizes, [0 for _ in range(len(sizes))], valve_id)
+
+        self.pressure_sizes = dict()
+        for (s,p) in list(zip(sizes, pressures)):
+            self.pressure_sizes[str(s)] = p 
+        
+        self.base_pressure = pressures[0]
+        self.sensor = Pressure_Sensor()
+    
+    def get_base_pressure(self) -> float:
+        """
+            :return: the pressure (mBar) of the cube when it is in its resting position
+        """
+        return self.base_pressure
+
+    def get_pressure_for_size(self, size: int) -> float:
+        """
+            :param size: the target size(cm) for this pressure pouch
+            :return the target pressure for the cube to achieve the given size, or -1 if the size is not defined for the cube
+        """
+        if str(size) not in self.pressure_sizes:
+            return -1
+        
+        return self.pressure_sizes[str(size)]
+    
+    def pressure(self) -> float:
+        """
+            :return: the current pressure within the cube
+        """
+        return self.sensor.read()
+
 
 class Pump_valve:
     """
