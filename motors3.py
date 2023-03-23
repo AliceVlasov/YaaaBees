@@ -3,10 +3,23 @@ import smbus2 as smbus
 from time import sleep
 from datetime import datetime
 
+class MockMotorControl():
+    def __init__(self):
+        print("Mock Motor control.")
+        self.id = -1
+        self.speed = -1
+
+    def setMotor(self, id, speed):
+        self.id = id
+        self.speed = speed
+
+    def stopMotor(self, id):
+        self.id = id
+
 class Motors(object):
     def __init__(self):
         print ("Starting SMBus . . .")
-        self.bus = smbus.SMBus(1)
+        #self.bus = smbus.SMBus(1)
         sleep(2)
         print ("SMBus Started.")
         self.mc = MotorControl()
