@@ -130,8 +130,18 @@ class Cube_Controller:
             Once this condition is met, it checks if loop was stopped by unsafe pressure or by the main thread. If it was the main thread,
             no further action must be taken, if it was cause by unsafe pressure readings, then emergency stop is triggered.
         """
+        prev_pressure = self.cube.pressure()
+        
         while self.cube_pressure_in_range() and self.keep_monitoring:
             sleep(0.1)
+            
+            # check that the pressure is changing at all!
+            nxt_pressure = self.cube_pressure()
+            if abs(next_pressure - prev_pressure()) < 1:
+                print("pressure is not changing")
+                self.keep_monitoring = False
+            else:
+                prev_pressure = next_pressure
         
         if self.keep_monitoring:
             self.emergency_stop()
@@ -169,6 +179,40 @@ class Cube_Controller:
         while(self.cube.pressure() < base_pressure):
             sleep(0.1)
         self.stop_inflate(False)
+    
+    def reach_pressure(self, target_pressure:float) -> bool:
+        pressure_is_changing = True
+        prev_pressure = self.cube.pressure()
+        
+        sgn = cmp(target_pressure, prev_pressure)
+        
+        # figure out if we should be inflating or deflating
+        if sgn < 1:
+            self.start_deflate(False)
+        elif sgn > 1:
+            self.start_inflate(False)
+        
+        cur_sgn = sgn
+        # continue inflating/deflating while the difference between the current pressure and target pressure is large,
+        # while the current pressure does not overpass the target pressure, and the pressure continues to change
+        while (abs(prev_pressure-target_pressure) > 1 and sgn == cur_sgn and pressure_is_changing):
+            sleep(0.1)
+            next_pressure = self.cube.pressure()
+            cur_sgn = 
+            
+            if abs(next_pressure - prev_pressure()) < 1:
+                print("pressure not changing")
+                pressure_is_changing = False
+                
+        
+        
+        # stop inflating
+        self.stop_inflate(False)
+        
+        if not pressure_is_change:
+            return False
+
+        return True
         
     
     def inflate_to_size(self, size:int) -> bool:
@@ -187,12 +231,7 @@ class Cube_Controller:
             print("Invalid size {0} for cube".format(size))
             return False
 
-        self.start_inflate(False)
-        while (self.cube.pressure() < inflate_pressure):
-            sleep(0.1)
-        self.stop_inflate(False)
-
-        return True
+        return self.reach_pressure(inflate_pressure)
     
     def get_pouch_size_range(self, pouch_name: str) -> Tuple[int,int]:
         """
