@@ -36,19 +36,14 @@ class Window(Frame):
         inflateButton = Button(self.master, text="Inflate", command=self.setInflate, bg="firebrick", fg="white")
         deflateButton = Button(self.master, text="Deflate", command=self.setDeflate, bg="firebrick", fg="white")
         #scale = Scale(self.master, cursor="dot", from_=50, to=200, orient=HORIZONTAL, command=self.valuecheck, tickinterval=50)
-<<<<<<< HEAD
+
         #self.slider = scale
-=======
         self.slider = 100 # scale
->>>>>>> 318f6b10de72d4dce7416fce0e7f783faa968b46
 
         inflateButton.place(x=440, y=340, height=60, width=60)
         deflateButton.place(x=500, y=340, height=60, width=60)
         #scale.place(x=350, y=260, height=75, width=160)
-<<<<<<< HEAD
 
-=======
->>>>>>> 318f6b10de72d4dce7416fce0e7f783faa968b46
         self.master.mainloop()
 
     def valuecheck(self, value):

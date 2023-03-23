@@ -33,7 +33,7 @@ class Controller:
             'cube':         Pouch("cube", 100,100, 3),
             'thick sleeve': Pouch("thick_sleeve", 100, 80, 3),
             'cylinder sleeve': Pouch("cylinder_sleeve", 75, 60, 3),
-            'thiccc thigh': Pouch("thiccc thigh", 100, 60, 3)
+            'thiccc thigh': Pouch("thiccc thigh",100, 100, 3)
         }
     
     def inflate_pouch(self, pouch_name:str):

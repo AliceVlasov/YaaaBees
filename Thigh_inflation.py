@@ -6,13 +6,7 @@ controller = Controller()
 
 #inflating
 controller.inflate_pouch("thiccc thigh")
-sleep(7)
+sleep(12)
 controller.stop_inflate()
 
-#deflating
-controller.deflate_pouch("thiccc thigh")
-sleep(5)
-controller.stop_deflate()
-
-#cleanup
 controller.cleanup()
