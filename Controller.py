@@ -22,9 +22,9 @@ class Controller:
         self.deflate_pump = Pump(_DEFLATE_PUMP_PORT, 0)
         self.pump_valve = Pump_valve(_PUMP_VALVE_PORT, "pump_valve")
         self.pouches = {
-            'cube':            Pouch("cube", 100, 100, 5, 3),
+            'cube':            Pouch("cube", 100, 100, 10, 3),
             'thick_sleeve':    Pouch("thick_sleeve", 100, 80, 4, 3),
-            'left_thigh':      Pouch("left_thigh", 50, 50, 2, 3),
+            'left_thigh':      Pouch("left_thigh", 100, 60, 10, 3),
             'cylinder_sleeve': Pouch("cylinder_sleeve", 75, 60, 7, 3),
             'thiccc_thigh':    Pouch("thiccc_thigh", 100, 60, 1, 3),
             'left_leg':        Pouch("left_leg", 60, 60, 3, 1),
