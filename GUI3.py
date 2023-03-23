@@ -22,12 +22,8 @@ class Window(Frame):
             "left thigh": 1
         }
         self.pouches = {
-            0: "cube",
             1: "left leg",
             2: "left thigh",
-            3: "thick sleeve",
-            4: "cylinder sleeve",
-            5: "thiccc thigh"
         }
 
         # Window settings 
@@ -50,8 +46,8 @@ class Window(Frame):
         lab.place(x=0, y=-40, relwidth=1, relheight=1)
 
         # Create the inflate/deflate buttons.
-        inflateButton = Button(self.master, text="Inflate", command=self.setInflate, bg="firebrick", fg="white")
-        deflateButton = Button(self.master, text="Deflate", command=self.setDeflate, bg="firebrick", fg="white")
+        inflateButton = Button(self.master, text="Activate", command=self.setInflate, bg="firebrick", fg="white")
+        deflateButton = Button(self.master, text="Reset", command=self.setDeflate, bg="white", fg="black")
         self.disableButton(deflateButton)
 
         # Create the pouch selection buttons. 
