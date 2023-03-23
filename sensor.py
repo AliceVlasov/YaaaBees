@@ -1,5 +1,4 @@
 import ms5803py
-import time
 from Air import Sensor
 
 class Sensor:
@@ -11,5 +10,5 @@ class Pressure_Sensor(Sensor):
         self.sensor = ms5803py.MS5803()
     
     def read(self):
-        pressure, _ = s.read(pressure_osr=4096)
+        pressure, _ = self.s.read(pressure_osr=4096)
         return pressure
