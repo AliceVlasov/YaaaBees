@@ -2,56 +2,157 @@
     This file is the home of our hardware configuration including the pumps and valves we are using, the silicone
     pouches and their inflate and deflate rates, and all the functions needed for Air and GUI to communicate with each other.
 """
-from typing import Tuple
+from typing import Tuple, Callable
 from time import time, sleep
-from Air import Pump, Pouch, Pressure_Pouch, Pump_valve
-from threading import Timer
+from Air import Pump, Pressure_Pouch, Pump_valve
+from threading import Thread
 
 _INFLATE_PUMP_PORT = 4
 _DEFLATE_PUMP_PORT = 5
 _PUMP_VALVE_PORT = 2
 
 class Cube_Controller:
-    def __init__(self):
+    def __init__(self, gui_safety_stop: Callable):
         """
             Initialise a new controller for the cube
+
+            :param gui_safety_stop: function to call if the user causes the cube's pressure to exceed safe bounds
         """
         self.inflate_pump = Pump(_INFLATE_PUMP_PORT, 0)
         self.deflate_pump = Pump(_DEFLATE_PUMP_PORT, 0)
         self.pump_valve = Pump_valve(_PUMP_VALVE_PORT, "pump_valve")
         self.cube = Pressure_Pouch("cube", 100, 80, [3,4,5,6], [966, 969, 974, 986], 3)
         
+        self.pressure_monitor = None
+        self.keep_monitoring = False
         self.reset_pouch()
+
+        self.gui_safety_stop = gui_safety_stop
+
+        self.inflating = False
+        self.deflating = False
     
-    def start_deflate(self):
+    def start_pressure_monitor(self):
+        """
+            Starts a new thread that will wait for keep_monitoring to be set to False or for the cube's pressure to exceed the range specified at initialisation
+        """
+        self.keep_monitoring = True
+
+        self.pressure_monitor = Thread(target=self.monitor_pressure)
+        self.pressure_monitor.start()
+        print("started pressure monitor")
+    
+    def stop_pressure_monitor(self):
+        """
+            Stops existing the thread  (if any) that is waiting for keep_monitoring to be set to False or for the cube's pressure to exceed the range specified at initialisation
+        """
+        self.keep_monitoring = False
+        print("pressure monitor thread stopped")
+
+        if self.pressure_monitor != None and self.pressure_monitor.is_alive():            
+            self.pressure_monitor.join()
+                
+        self.pressure_monitor = None
+    
+    def start_deflate(self, with_safety_monitor: bool):
+        """
+            Starts deflating pouch and the pressure safety monitor if requested
+
+            :param with_safety_monitor: whether the safety monitor, which will automatically trigger stop deflating after the safe pressure range is exceeded, should be started
+        """
         self.pump_valve.open_deflate()
         self.deflate_pump.set_speed(self.cube.deflate_speed)
         self.deflate_pump.run()
         self.cube.open_valve()
 
+        self.deflating = True
+
+        if with_safety_monitor:
+            self.start_pressure_monitor()
+
         print("Started deflating cube")
     
-    def stop_deflate(self):
+    def stop_deflate(self, with_safety_monitor: bool):
+        """
+            Stops the deflating pumps and closes the currently open pouch valve, and stops the safety monitor if applicable
+
+            :param with_safty_monitor: whether a safety monitor might be running
+        """
         self.cube.close_valve()
         self.deflate_pump.stop()
         self.pump_valve.reset()
 
+        self.deflating = False
+
+        if with_safety_monitor:
+            self.stop_pressure_monitor()
+
         print("Stopped deflating cube")
 
-    def start_inflate(self):
+    def start_inflate(self, with_safety_monitor: bool):
+        """
+            Starts inflating pouch and the pressure safety monitor if requested
+
+            :param with_safety_monitor: whether the safety monitor, which will automatically trigger stop inflating after the safe pressure range is exceeded, should be started
+        """
         self.pump_valve.open_inflate()
         self.inflate_pump.set_speed(self.cube.inflate_speed)
         self.inflate_pump.run()
         self.cube.open_valve()
 
+        self.inflating = True
+
+        if with_safety_monitor:
+            self.start_pressure_monitor()
+
         print("Started inflating cube")
     
-    def stop_inflate(self):
+    def stop_inflate(self, with_safety_monitor: bool):
+        """
+            Stops the inflating pumps and closes the currently open pouch valve, and stops the safety monitor if applicable
+
+            :param with_safty_monitor: whether a safety monitor might be running
+        """
         self.cube.close_valve()
         self.inflate_pump.stop()
         self.pump_valve.reset()
 
+        self.inflating = False
+
+        if with_safety_monitor:
+            self.stop_pressure_monitor()
+
         print("Stopped inflating cube")
+    
+    def monitor_pressure(self):
+        """
+            Waits until the cube is no longer in a safe pressure range or self.keep_monitoring is set to False (by the main Thread).
+            Once this condition is met, it checks if loop was stopped by unsafe pressure or by the main thread. If it was the main thread,
+            no further action must be taken, if it was cause by unsafe pressure readings, then emergency stop is triggered.
+        """
+        while self.cube_pressure_in_range() and self.keep_monitoring:
+            sleep(0.1)
+        
+        if self.keep_monitoring:
+            self.emergency_stop()
+    
+    def emergency_stop(self):
+        """
+            Stops whichever pumps are running and tells the gui to reflect the changes
+        """
+        print("emergency stopping pumps")
+        if self.inflating:
+            self.stop_inflate(False)
+            self.gui_safety_stop()
+        elif self.deflating:
+            self.stop_deflate(False)
+            self.gui_safety_stop()
+    
+    def cube_pressure_in_range(self) -> bool:
+        """
+            :return: whether the cube is still within a safe pressure range
+        """
+        return self.cube.pressure_within_range()
         
     def reset_pouch(self):
         """
@@ -59,15 +160,15 @@ class Cube_Controller:
         """
         base_pressure = self.cube.get_base_pressure()
 
-        self.start_deflate()
+        self.start_deflate(False)
         while(self.cube.pressure() > base_pressure):
             sleep(0.1)
-        self.stop_deflate()
+        self.stop_deflate(False)
 
-        self.start_inflate()
+        self.start_inflate(False)
         while(self.cube.pressure() < base_pressure):
             sleep(0.1)
-        self.stop_inflate()
+        self.stop_inflate(False)
         
     
     def inflate_to_size(self, size:int) -> bool:
@@ -86,10 +187,10 @@ class Cube_Controller:
             print("Invalid size {0} for cube".format(size))
             return False
 
-        self.start_inflate()
+        self.start_inflate(False)
         while (self.cube.pressure() < inflate_pressure):
             sleep(0.1)
-        self.stop_inflate()
+        self.stop_inflate(False)
 
         return True
     

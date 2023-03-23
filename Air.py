@@ -145,14 +145,16 @@ class Pressure_Pouch(Pouch):
         for (s,p) in list(zip(sizes, pressures)):
             self.pressure_sizes[str(s)] = p 
         
-        self.base_pressure = pressures[0]
+        sorted_pressures = sorted(pressures)
+
+        self.pressure_range = (sorted_pressures[0], sorted_pressures[-1])
         self.sensor = Pressure_Sensor()
     
     def get_base_pressure(self) -> float:
         """
             :return: the pressure (mBar) of the cube when it is in its resting position
         """
-        return self.base_pressure
+        return self.pressure_range[0]
 
     def get_pressure_for_size(self, size: int) -> float:
         """
@@ -169,6 +171,13 @@ class Pressure_Pouch(Pouch):
             :return: the current pressure within the cube
         """
         return self.sensor.read()
+
+    def pressure_within_range(self) -> bool:
+        """
+            :return: whether the current internal pressure of the pouch is within the safe range defined at initialisation
+        """
+        pressure = self.pressure()
+        return pressure > self.pressure_range[0] and pressure < self.pressure_range[1]
 
 
 class Pump_valve:
