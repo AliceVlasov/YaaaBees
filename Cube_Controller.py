@@ -258,19 +258,29 @@ class Cube_Controller:
 
         return self.reach_pressure(inflate_pressure)
     
-    def get_pouch_size_range(self, pouch_name: str) -> Tuple[int,int]:
+    def get_pouch_size_range(self) -> Tuple[int,int]:
         """
             :param pouch_name: the name of the pouch whose size range is desired
             :return: the minimum and maximum sizes(cm) the given pouch can achieve
         """
-        pouch = self.get_pouch(pouch_name)
+        sizes = self.cube.get_size_range()
 
-        if not pouch:
-            print("Invalid pouch name.")
-            return (-1,-1)
+        # if not pouch:
+        #     print("Invalid pouch name.")
+        #     return (-1,-1)
         
-        return pouch.get_size_range()
+        return sizes
         
+    def cleanup(self):
+        """
+            Make sure all the pouches and pumps are reset and valves are in 
+            neutral position before shutting off
+        """
+        print("Cleaning up")
+        self.stop_inflate(True)
+        self.stop_deflate(True)
 
-    
+        self.reset_pouch()
+
+        self.pump_valve.reset()
     
