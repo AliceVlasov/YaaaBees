@@ -5,7 +5,7 @@ except ImportError:
 from PIL import ImageTk, Image
 from time import sleep
 from Air import Pump
-from Controller import Controller
+from Safe_Controller import Safe_Controller
 
 class Window(Frame):
     inflate = False
@@ -14,16 +14,17 @@ class Window(Frame):
 
     def __init__(self, master=None):
         # Setup controller for hardware
-        self.controller = Controller()
+        self.controller = Safe_Controller()
         self.pouch_name = "cube"
         self.selected = IntVar()
         self.slider = {
-            "left leg": 1,
-            "left thigh": 1
+            "cube": 0,
+            "left_leg": 1,
+            "left_thigh": 1
         }
         self.pouches = {
-            1: "left leg",
-            2: "left thigh",
+            1: "left_leg",
+            2: "left_thigh",
         }
 
         # Window settings 
@@ -45,88 +46,80 @@ class Window(Frame):
         log.place(x=100, y=40)
         lab.place(x=0, y=-40, relwidth=1, relheight=1)
 
-        # Create the inflate/deflate buttons.
-        inflateButton = Button(self.master, text="Activate", command=self.setInflate, bg="firebrick", fg="white")
-        deflateButton = Button(self.master, text="Reset", command=self.setDeflate, bg="white", fg="black")
-        self.disableButton(deflateButton)
-
-        # Create the pouch selection buttons. 
-        cube = Radiobutton(self.master, text="cube", variable=self.selected, value=0, command=self.setSelection)
-        left_leg = Radiobutton(self.master, text="left_leg", variable=self.selected, value=1, command=self.setSelection)
-        left_thigh = Radiobutton(self.master, text="left_thigh", variable=self.selected, value=2, command=self.setSelection)
-        thick_sleeve = Radiobutton(self.master, text="thick_sleeve", variable=self.selected, value=3, command=self.setSelection)
-        cylinder_sleeve = Radiobutton(self.master, text="cylinder_sleeve", variable=self.selected, value=4, command=self.setSelection)
-        #thiccc_thigh = Radiobutton(self.master, text="thiccc_thigh", variable=self.selected, value=5, command=self.setSelection)
-        reset = Radiobutton(self.master, text="reset (still the thigh)", variable=self.selected, value=5, command=self.setSelection)
-        
-        gscale = Scale(self.master, cursor="dot", from_=1, to=6, orient=HORIZONTAL, command=self.valuecheck)
-        self.scale = gscale
-        self.slider[self.pouch_name] = gscale.get()
-
         text = Text(self.master, height=2, width=30, font=('Verdana', 10))
         text.insert(INSERT, self.pouch_name + " selected")
         text.place(x=525, y=100)
 
         self.text = text
 
+        # Create the inflate/deflate buttons.
+        inflateButton = Button(self.master, text="Activate", command=self.activatePump, bg="firebrick", fg="white")
+        deflateButton = Button(self.master, text="Reset", command=self.resetPouch, bg="white", fg="black")
+        #self.disableButton(deflateButton)
+
+        # Create the pouch selection buttons. 
+        left_leg = Radiobutton(self.master, text="left_leg", variable=self.selected, value=1, command=self.setSelection)
+        left_thigh = Radiobutton(self.master, text="left_thigh", variable=self.selected, value=2, command=self.setSelection)
+    
+        gscale = Scale(self.master, cursor="dot", from_=1, to=6, orient=HORIZONTAL, command=self.valuecheck)
+        self.scale = gscale
+        self.slider[self.pouch_name] = gscale.get()
+
         # Place all the buttons. 
         inflateButton.place(x=340, y=400, height=60, width=60)
         deflateButton.place(x=400, y=400, height=60, width=60)
-        cube.place(x=480, y=380)
         left_leg.place(x=430, y=320)
         left_thigh.place(x=440, y=240)
-        thick_sleeve.place(x=480, y=400)
-        cylinder_sleeve.place(x=480, y=420)
-        reset.place(x=480, y=440)
 
-        gscale.place(x=500, y=305, height=40, width=100)
+        self.activateButton = inflateButton
+        self.resetButton = deflateButton
+
+        gscale.place(x=500, y=400, height=40, width=100)
 
         self.master.mainloop()
 
     # Value check for the stepped slider functionality. 
-    def valuecheck(self, value):
+    def valuecheck(self, value: int):
         newvalue = min(self.valuelist, key=lambda x:abs(x-float(value)))
         self.slider[self.pouch_name] = newvalue
+
+    def write(self, input: str):
+        self.text.delete('1.0', END)
+        self.text.insert(INSERT, input)
 
     # Selection of the pouch using Radiobuttons. 
     def setSelection(self):
         self.pouch_name = self.pouches[self.selected.get()]
         self.slider[self.pouch_name] = self.scale.get()
-        print(self.pouch_name)
-        self.text.delete('1.0', END)
-        self.text.insert(INSERT, self.pouch_name + " selected")
+        self.write(self.pouch_name + " selected")
+        legal_min, legal_max = self.controller.get_pouch_size_range(self.pouch_name)
+        self.scale["from"] = legal_min
+        self.scale["to"] = legal_max
 
-    def disableButton(self, button: Button):
-        button["state"] = DISABLED
-        button["bg"] = "#ffffff"
-        button["fg"] = "#000000"
-
-    # Inflates the pouch. 
-    def setInflate(self):
+    # Brings the pouch to a given size. 
+    def activatePump(self):
         # Ensure that we aren't deflating already.
-        print(self.slider)
-        assert (not self.deflate)
-        self.inflate = not self.inflate
-        print("Inflating: " + str(self.inflate))
-
-        if self.inflate:
-            self.controller.inflate_pouch(self.pouch_name)
-        else:
-            self.controller.stop_inflate()
+        print("__SIGNAL RECEIVED")
+        pouch_size = self.slider[self.pouch_name]
+        self.write("{0} to size {1}".format(self.pouch_name, pouch_size))
+        self.disableButton(self.activateButton)
+        self.controller.inflate_pouch_to_size(self.pouch_name, pouch_size)
+        #self.activateButton.update()
+        self.enableButton(self.activateButton)
 
     # Deflates the pouch.
-    def setDeflate(self):
+    def resetPouch(self):
         # Ensure that we aren't inflating already.
-        assert (not self.inflate)
-        self.deflate = not self.deflate
-
-        print("Deflating: " + str(self.inflate))
-
-        if self.deflate:
-            self.controller.deflate_pouch(self.pouch_name)
-        else:
-            self.controller.stop_deflate()
+        self.controller.reset_pouch(self.pouch_name) 
     
+    def disableButton(self, button: Button):
+        button.config(state=DISABLED, bg="#ffffff", fg="#000000")
+        button.update()
+
+    def enableButton(self, button: Button):
+        button.update()
+        button.config(state=NORMAL, bg="firebrick", fg="white")
+
     def cleanup(self):
         """
             Make sure setup is neutralised before shutting down

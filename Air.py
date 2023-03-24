@@ -84,7 +84,7 @@ class Pouch:
         if str(size) not in self.sizes:
             return -1
 
-        return self.size[str(size)]
+        return self.sizes[str(size)]
         
     
     def update_inflate_status(self, time_inflated: float) -> None:
