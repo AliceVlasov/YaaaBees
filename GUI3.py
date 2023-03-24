@@ -73,6 +73,10 @@ class Window(Frame):
         self.scale["from"] = legal_min
         self.scale["to"] = legal_max
         self.slider[self.pouch_name] = gscale.get()
+        newvalues = []
+        for i in range(legal_min, legal_max):
+            newvalues.append(i)
+        self.valuelist = newvalues
 
         # Place all the buttons. 
         inflateButton.place(x=340+xshift, y=400+yshift, height=60, width=60)
@@ -89,8 +93,8 @@ class Window(Frame):
 
     # Value check for the stepped slider functionality. 
     def valuecheck(self, value: int):
-        #newvalue = min(self.valuelist, key=lambda x:abs(x-float(value)))
-        self.slider[self.pouch_name] = value
+        newvalue = min(self.valuelist, key=lambda x:abs(x-float(value)))
+        self.slider[self.pouch_name] = newvalue
 
     def write(self, input: str):
         self.text.delete('1.0', END)
