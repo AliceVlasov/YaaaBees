@@ -1,5 +1,5 @@
-from iotools import MotorControl
-import smbus2 as smbus
+#from iotools import MotorControl
+#import smbus2 as smbus
 from time import sleep
 from datetime import datetime
 
@@ -19,10 +19,10 @@ class MockMotorControl():
 class Motors(object):
     def __init__(self):
         print ("Starting SMBus . . .")
-        self.bus = smbus.SMBus(1)
+        #self.bus = smbus.SMBus(1)
         sleep(2)
         print ("SMBus Started.")
-        self.mc = MotorControl()
+        self.mc = MockMotorControl()
         self.encoder_address = 0x05
         self.encoder_register = 0x0
         self.num_encoder_ports = 6
@@ -50,4 +50,3 @@ class Motors(object):
         self.__i2c_read_encoder()
         ts = str(datetime.now())
         print (self.encoder_data, ts.rjust(50,'.'))
-

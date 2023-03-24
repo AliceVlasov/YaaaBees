@@ -98,7 +98,10 @@ class Window(Frame):
         self.write(self.pouch_name + " selected")
         legal_min, legal_max = self.controller.get_pouch_size_range(self.pouch_name)
         self.scale["from"] = legal_min
+        newvalues = []
         self.scale["to"] = legal_max
+        for i in range(legal_min, legal_max):
+            newvalues.append(i)
 
     # Brings the pouch to a given size. 
     def activatePump(self):
