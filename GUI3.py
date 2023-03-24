@@ -27,6 +27,10 @@ class Window(Frame):
             2: "left_thigh",
         }
 
+        shift = 0
+        xshift = shift
+        yshift = shift
+
         # Window settings 
         Frame.__init__(self, master)     
         self.master = master
@@ -40,21 +44,21 @@ class Window(Frame):
 
         # Background image of the body. 
         img = ImageTk.PhotoImage(Image.open("media/body3.png"))
-        logo = ImageTk.PhotoImage(Image.open("media/logo.png"))
+        #logo = ImageTk.PhotoImage(Image.open("media/logo.png"))
         lab = Label(self.master, image=img)
-        log = Label(self.master, image=logo)
-        log.place(x=100, y=40)
-        lab.place(x=0, y=-40, relwidth=1, relheight=1)
+        #log = Label(self.master, image=logo)
+        #log.place(x=100, y=40)
+        lab.place(x=0+xshift, y=-40+yshift, relwidth=1, relheight=1)
 
         text = Text(self.master, height=2, width=30, font=('Verdana', 10))
         text.insert(INSERT, self.pouch_name + " selected")
-        text.place(x=525, y=100)
+        text.place(x=525+xshift, y=100+yshift)
 
         self.text = text
 
         # Create the inflate/deflate buttons.
         inflateButton = Button(self.master, text="Activate", command=self.activatePump, bg="firebrick", fg="white")
-        deflateButton = Button(self.master, text="Reset", command=self.resetPouch, bg="white", fg="black")
+        deflateButton = Button(self.master, text="Reset", command=self.resetPouch, bg="firebrick", fg="white")
         #self.disableButton(deflateButton)
 
         # Create the pouch selection buttons. 
@@ -66,15 +70,15 @@ class Window(Frame):
         self.slider[self.pouch_name] = gscale.get()
 
         # Place all the buttons. 
-        inflateButton.place(x=340, y=400, height=60, width=60)
-        deflateButton.place(x=400, y=400, height=60, width=60)
-        left_leg.place(x=430, y=320)
-        left_thigh.place(x=440, y=240)
+        inflateButton.place(x=340+xshift, y=400+yshift, height=60, width=60)
+        deflateButton.place(x=400+xshift, y=400+yshift, height=60, width=60)
+        left_leg.place(x=430+xshift, y=320+yshift)
+        left_thigh.place(x=440+xshift, y=240+yshift)
 
         self.activateButton = inflateButton
         self.resetButton = deflateButton
 
-        gscale.place(x=500, y=400, height=40, width=100)
+        gscale.place(x=500+xshift, y=400+yshift, height=40, width=100)
 
         self.master.mainloop()
 
@@ -104,14 +108,15 @@ class Window(Frame):
         self.write("{0} to size {1}".format(self.pouch_name, pouch_size))
         self.disableButton(self.activateButton)
         self.controller.inflate_pouch_to_size(self.pouch_name, pouch_size)
-        #self.activateButton.update()
         self.enableButton(self.activateButton)
 
     # Deflates the pouch.
     def resetPouch(self):
-        # Ensure that we aren't inflating already.
-        self.controller.reset_pouch(self.pouch_name) 
-    
+        # Ensure that we aren't inflating already 
+        self.disableButton(self.resetButton)
+        self.controller.reset_pouch(self.pouch_name)
+        self.enableButton(self.resetButton)
+
     def disableButton(self, button: Button):
         button.config(state=DISABLED, bg="#ffffff", fg="#000000")
         button.update()
