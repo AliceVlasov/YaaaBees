@@ -1,4 +1,4 @@
-Overview of how everything is setup:
+Overview of how everything is setup
 
 Motorboard ports:
 --Inflate pump - 4
@@ -15,4 +15,18 @@ Motorboard Port configuration:
   |      1  |
   |  4   2  |
   |  5   3  |
-  -----------     
+  -----------
+
+Running Leg:
+--Main.py - UI
+--Safe_Controller.py - running commands
+--cube_testing.py - example test file
+
+Running Cube:
+--CubeMain.py - UI
+--Cube_Controller - running commands
+--leg_testing.py - example test file
+
+Emergency: if the pumps or valves are still running after the code stops running
+--emergency.py - turns everything off
+     
