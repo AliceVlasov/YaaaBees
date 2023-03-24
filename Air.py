@@ -43,7 +43,7 @@ class Pump:
         self.stop()
 
 class Pouch:
-    def __init__(self, name: str, inflate_speed: int, deflate_speed: int, sizes: List[int], times: List[float], valve_id: int):
+    def __init__(self, name: str, inflate_speed: int, deflate_speed: int, sizes: List[int], times: List[Tuple[float, float]], valve_id: int):
         """
             Initialise a new Silicone Pouch
 
@@ -60,20 +60,24 @@ class Pouch:
 
         self.valve = Silicone_valve(valve_id, name+" valve")
 
+        # make dictionary of size to inflate/deflate times
         self.sizes = dict()
         for (s,t) in list(zip(sizes, times)):
-            self.sizes[str(s)] = t
+            self.sizes[s] = [t[0], t[1]]
 
         sorted_sizes = sorted(sizes)
         self.size_range = (sorted_sizes[0], sorted_sizes[-1])
 
-        self.inflate_status = 0 # pouch starts neutral
+        self.current_size = sizes[0] # pouch starts neutral
 
         # make sure valve is closed by default
         self.close_valve()
     
-    def get_deflate_needed(self):
-        return self.inflate_status
+    def get_deflate_needed(self) -> float:
+        """
+            :return: the amount of time needed to deflate this pouch until it reaches its neutral state
+        """
+        return self.sizes[self.current_size][1]
     
     def get_inflate_time_for_size(self, size: int):
         """
@@ -81,24 +85,24 @@ class Pouch:
         
             :param size: the size (cm) setting for this pouch
         """
-        if str(size) not in self.sizes:
+        if size not in self.sizes:
             return -1
 
-        return self.sizes[str(size)]
+        return self.sizes[size][0]
         
     
-    def update_inflate_status(self, time_inflated: float) -> None:
+    def update_inflate_status(self, size: int) -> None:
         """
             Updates the net amount of time the pouch has spend inflating
 
-            :param time_inflated: the amount of time this pouch has been inflating so far, if deflating, this should be negative
+            :param size: the current size of the pouch
         """
-        print("increased pouch {0}'s inflate status by {1}".format(self.name, time_inflated))
-        self.inflate_status += time_inflated
+        print("pouch {0}'s size is now {1}".format(self.name, size))
+        self.current_size = size
     
     def reset_inflate_status(self):
-        print("reset pouch {}'s inflate status to 0".format(self.name))
-        self.inflate_status = 0
+        self.current_size = self.size_range[0]
+        print("reset pouch {0}'s size to {1}".format(self.name, self.current_size))
     
     def get_size_range(self) -> Tuple[int,int]:
         """

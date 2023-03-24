@@ -8,11 +8,23 @@ calf = controller.get_pouch("left_leg")
 thigh = controller.get_pouch("left_thigh")
 cube = controller.get_pouch("cube")
 
+controller.inflate_pouch_to_size("left_leg", 19)
+sleep(3)
+
+controller.inflate_pouch_to_size("left_thigh", 26)
+sleep(3)
+
+controller.reset_pouch("left_leg")
+
+sleep(3)
+
+controller.reset_pouch("left_thigh")
+
 #inflating
 
-controller.start_inflate(calf)
-sleep(2)
-controller.stop_inflate(calf)
+#controller.start_inflate(thigh)
+#sleep(7)
+#controller.stop_inflate(thigh)
 #sleep(5)
 #controller.start_inflate(thigh)
 #sleep(5)
@@ -22,13 +34,13 @@ controller.stop_inflate(calf)
 #sleep(10)
 #controller.stop_inflate(cube)
 
-sleep(15)
+#sleep(15)
 
 #sleep(5)
 #deflating
-controller.start_deflate(calf)
-sleep(1)
-controller.stop_deflate(calf)
+#controller.start_deflate(thigh)
+#sleep(5)
+#controller.stop_deflate(thigh)
 #sleep(5)
 #controller.start_deflate(thigh)
 #sleep(4)

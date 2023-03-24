@@ -10,7 +10,7 @@ from Safe_Controller import Safe_Controller
 class Window(Frame):
     inflate = False
     deflate = False
-    valuelist = [1, 2, 3, 4, 5, 6]
+    valuelist = []
 
     def __init__(self, master=None):
         # Setup controller for hardware
@@ -102,6 +102,7 @@ class Window(Frame):
         self.scale["to"] = legal_max
         for i in range(legal_min, legal_max):
             newvalues.append(i)
+        self.valuelist = newvalues
 
     # Brings the pouch to a given size. 
     def activatePump(self):
