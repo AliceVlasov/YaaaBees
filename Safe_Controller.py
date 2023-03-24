@@ -94,7 +94,7 @@ class Safe_Controller:
             return False 
 
         self.reset_pouch(pouch_name)
-        sleep(4)
+        sleep(2)
 
         inflate_time = pouch.get_inflate_time_for_size(size)
 

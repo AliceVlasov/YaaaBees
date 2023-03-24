@@ -15,15 +15,13 @@ class Window(Frame):
     def __init__(self, master=None):
         # Setup controller for hardware
         self.controller = Safe_Controller()
-        self.pouch_name = "cube"
+        self.pouch_name = "left_thigh"
         self.selected = IntVar()
         self.slider = {
-            "cube": 0,
             "left_leg": 1,
             "left_thigh": 1
         }
         self.pouches = {
-            0: "cube",
             1: "left_leg",
             2: "left_thigh",
         }
@@ -65,9 +63,15 @@ class Window(Frame):
         # Create the pouch selection buttons. 
         left_leg = Radiobutton(self.master, text="left_leg", variable=self.selected, value=1, command=self.setSelection)
         left_thigh = Radiobutton(self.master, text="left_thigh", variable=self.selected, value=2, command=self.setSelection)
+        
+        #set default selection to left_thigh
+        self.selected.set(2)
     
         gscale = Scale(self.master, cursor="dot", from_=1, to=6, orient=HORIZONTAL, command=self.valuecheck)
         self.scale = gscale
+        legal_min, legal_max = self.controller.get_pouch_size_range("left_thigh")
+        self.scale["from"] = legal_min
+        self.scale["to"] = legal_max
         self.slider[self.pouch_name] = gscale.get()
 
         # Place all the buttons. 
@@ -85,8 +89,8 @@ class Window(Frame):
 
     # Value check for the stepped slider functionality. 
     def valuecheck(self, value: int):
-        newvalue = min(self.valuelist, key=lambda x:abs(x-float(value)))
-        self.slider[self.pouch_name] = newvalue
+        #newvalue = min(self.valuelist, key=lambda x:abs(x-float(value)))
+        self.slider[self.pouch_name] = value
 
     def write(self, input: str):
         self.text.delete('1.0', END)
@@ -112,7 +116,7 @@ class Window(Frame):
         pouch_size = self.slider[self.pouch_name]
         self.write("{0} to size {1}".format(self.pouch_name, pouch_size))
         self.disableButton(self.activateButton)
-        self.controller.inflate_pouch_to_size(self.pouch_name, pouch_size)
+        self.controller.inflate_pouch_to_size(self.pouch_name, int(pouch_size))
         self.enableButton(self.activateButton)
 
     # Deflates the pouch.

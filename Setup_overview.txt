@@ -1,0 +1,18 @@
+Overview of how everything is setup:
+
+Motorboard ports:
+--Inflate pump - 4
+--Deflate pump - 5
+--Pump valve - 2
+--Cube valve - 0
+--Thigh valve - 1
+--Calf valve - 3
+
+Motorboard Port configuration:
+
+  -----------
+  |      0  |
+  |      1  |
+  |  4   2  |
+  |  5   3  |
+  -----------     

@@ -8,10 +8,10 @@ calf = controller.get_pouch("left_leg")
 thigh = controller.get_pouch("left_thigh")
 cube = controller.get_pouch("cube")
 
-controller.inflate_pouch_to_size("left_leg", 19)
+controller.inflate_pouch_to_size("left_leg", 17)
 sleep(3)
 
-controller.inflate_pouch_to_size("left_thigh", 26)
+controller.inflate_pouch_to_size("left_thigh", 24)
 sleep(3)
 
 controller.reset_pouch("left_leg")
