@@ -1,5 +1,5 @@
 from tkinter import *
-from GUI3 import Window
+from GUI_Cube import Window
 from PIL import ImageTk, Image
 
 root = Tk()
