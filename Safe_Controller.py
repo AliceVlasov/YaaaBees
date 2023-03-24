@@ -20,15 +20,15 @@ class Safe_Controller:
         self.deflate_pump = Pump(_DEFLATE_PUMP_PORT, 0)
         self.pump_valve = Pump_valve(_PUMP_VALVE_PORT, "pump_valve")
         self.pouches = {
-            #'cube':              Pouch("cube", 100, 80, [1,2,3], [5,7,9], 3),
+            'cube':              Pouch("cube", 100, 80, [1,2,3], [5,7,9], 0),
             # 'thick sleeve':      Pouch("thick_sleeve", 100, 80, 4, 3),
             # 'cylinder':          Pouch("cylinder", 50, 50, 2, 3),
             # 'cylinder sleeve':   Pouch("cylinder_sleeve", 75, 60, 7, 3),
-            'left_thigh':        Pouch("left_thigh", 100, 80, [1,2,3], [5,7,9], 1),
-            'left_leg':          Pouch("left_leg", 70, 40, [1,2,3], [5,7,9], 3),
+            'left_thigh':        Pouch("left_thigh", 100, 60, [1,2,3], [5,7,9], 1),
+            'left_leg':          Pouch("left_leg", 100, 60, [1,2,3], [5,7,9], 3),
         }
     
-    def get_pouch(self, pouch_name:str) -> Pouch:
+    def get_pouch(self, pouch_name: str) -> Pouch:
         if pouch_name in self.pouches:
             return self.pouches[pouch_name]
     

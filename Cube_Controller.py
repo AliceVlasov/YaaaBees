@@ -12,7 +12,7 @@ _DEFLATE_PUMP_PORT = 5
 _PUMP_VALVE_PORT = 2
 
 class Cube_Controller:
-    def __init__(self, gui_safety_stop: Callable):
+    def __init__(self, gui_safety_stop):
         """
             Initialise a new controller for the cube
 
@@ -21,18 +21,18 @@ class Cube_Controller:
         self.inflate_pump = Pump(_INFLATE_PUMP_PORT, 0)
         self.deflate_pump = Pump(_DEFLATE_PUMP_PORT, 0)
         self.pump_valve = Pump_valve(_PUMP_VALVE_PORT, "pump_valve")
-        self.cube = Pressure_Pouch("cube", 100, 80, [3,4,5,6], [966, 969, 974, 986], 3)
+        self.cube = Pressure_Pouch("cube", 100, 80, [3,4,5,6], [966, 969, 974, 986], 0)
         
         self.pressure_monitor = None
         self.keep_monitoring = False
-        self.reset_pouch()
+        #self.reset_pouch()
 
         self.gui_safety_stop = gui_safety_stop
 
         self.inflating = False
         self.deflating = False
         
-        self.reset_pouch()
+        #self.reset_pouch()
         print("FINISHED SETUP")
     
     def start_pressure_monitor(self):
@@ -143,7 +143,7 @@ class Cube_Controller:
             cur_pressure = self.cube.pressure()
             counter += 1
             
-            if counter == 5:
+            if counter == 10:
                 counter = 0      
                 if abs(cur_pressure - starting_pressure) < 0.5:
                     print("pressure is not changing")
@@ -196,14 +196,16 @@ class Cube_Controller:
         prev_pressure = start_pressure
         
         sgn = self.cmp(target_pressure, prev_pressure)
+        print("target pressure = {0}, start_pressure = {1}".format(target_pressure, start_pressure))
         
         # figure out if we should be inflating or deflating
-        if sgn < 1:
+        if sgn < 0:
             self.start_deflate(False)
-        elif sgn > 1:
+        elif sgn > 0:
             self.start_inflate(False)
         
         cur_sgn = sgn
+        print("sgn = {0}".format(sgn))
         
         counter = 0
         # continue inflating/deflating while the difference between the current pressure and target pressure is large,
@@ -213,7 +215,7 @@ class Cube_Controller:
             next_pressure = self.cube.pressure()
             counter += 1
             
-            if counter == 5:          
+            if counter == 10:          
                 if abs(next_pressure - start_pressure) < 0.5:
                     print("pressure not changing")
                     pressure_is_changing = False
@@ -222,11 +224,12 @@ class Cube_Controller:
             cur_sgn = self.cmp(target_pressure, next_pressure)
 
             prev_pressure = next_pressure
-                
+        
+        print("exited")
         # stop inflating or deflating
-        if sgn < 1:
+        if sgn < 0:
             self.stop_deflate(False)
-        elif sgn > 1:
+        elif sgn > 0:
             self.stop_inflate(False)
         
         if not pressure_is_changing:
@@ -250,6 +253,8 @@ class Cube_Controller:
         if inflate_pressure == -1:
             print("Invalid size {0} for cube".format(size))
             return False
+        
+        print("starting inflating to size")
 
         return self.reach_pressure(inflate_pressure)
     
