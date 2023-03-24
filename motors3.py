@@ -22,7 +22,7 @@ class Motors(object):
         self.bus = smbus.SMBus(1)
         sleep(2)
         print ("SMBus Started.")
-        self.mc = MockMotorControl()
+        self.mc = MotorControl()
         self.encoder_address = 0x05
         self.encoder_register = 0x0
         self.num_encoder_ports = 6

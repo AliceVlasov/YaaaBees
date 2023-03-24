@@ -15,22 +15,18 @@ class Safe_Controller:
     def __init__(self):
         """
             Initialise a new mannequin Controller
-
-            :param gui_safety_stop: function to be called when the GUI needs to be overridden because a pouch has been inflating or deflating for too long.
         """
         self.inflate_pump = Pump(_INFLATE_PUMP_PORT, 0)
         self.deflate_pump = Pump(_DEFLATE_PUMP_PORT, 0)
         self.pump_valve = Pump_valve(_PUMP_VALVE_PORT, "pump_valve")
         self.pouches = {
-            'cube':            Pouch("cube", 100, 100, [1,2,3], [5,7,9], 3),
+            'cube':            Pouch("cube", 100, 80, [1,2,3], [5,7,9], 3),
             # 'thick sleeve':    Pouch("thick_sleeve", 100, 80, 4, 3),
             # 'cylinder':        Pouch("cylinder", 50, 50, 2, 3),
             # 'cylinder sleeve': Pouch("cylinder_sleeve", 75, 60, 7, 3),
             'left_thigh':    Pouch("thiccc_thigh", 100, 60, [1,2,3], [5,7,9], 3),
             'left_leg':            Pouch("calf", 60, 60, [1,2,3], [5,7,9], 1),
         }
-
-        # for monitoring which pouches are inflating/deflating
     
     def get_pouch(self, pouch_name:str) -> Pouch:
         if pouch_name in self.pouches:
@@ -64,7 +60,7 @@ class Safe_Controller:
         self.inflate_pump.stop()
         self.pump_valve.reset()
 
-        print("Stopped deflating {}".format(pouch.name))
+        print("Stopped inflating {}".format(pouch.name))
         
     def reset_pouch(self, pouch_name: str):
         pouch = self.get_pouch(pouch_name)
