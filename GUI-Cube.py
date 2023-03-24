@@ -1,7 +1,4 @@
-try:
-    from tkinter import *
-except ImportError:
-    from Tkinter import *
+from tkinter import *
 from PIL import ImageTk, Image
 from time import sleep
 from Air import Pump
@@ -15,10 +12,9 @@ class Window(Frame):
     def __init__(self, master=None):
         # Setup controller for hardware
         self.controller = Safe_Controller()
-        self.pouch_name = "cube"
+        self.pouch_name = "None"
         self.selected = IntVar()
         self.slider = {
-            "cube": 0,
             "left_leg": 1,
             "left_thigh": 1
         }
@@ -46,12 +42,6 @@ class Window(Frame):
         log.place(x=100, y=40)
         lab.place(x=0, y=-40, relwidth=1, relheight=1)
 
-        text = Text(self.master, height=2, width=30, font=('Verdana', 10))
-        text.insert(INSERT, self.pouch_name + " selected")
-        text.place(x=525, y=100)
-
-        self.text = text
-
         # Create the inflate/deflate buttons.
         inflateButton = Button(self.master, text="Activate", command=self.activatePump, bg="firebrick", fg="white")
         deflateButton = Button(self.master, text="Reset", command=self.resetPouch, bg="white", fg="black")
@@ -65,14 +55,17 @@ class Window(Frame):
         self.scale = gscale
         self.slider[self.pouch_name] = gscale.get()
 
+        text = Text(self.master, height=2, width=30, font=('Verdana', 10))
+        text.insert(INSERT, self.pouch_name + " selected")
+        text.place(x=525, y=100)
+
+        self.text = text
+
         # Place all the buttons. 
         inflateButton.place(x=340, y=400, height=60, width=60)
         deflateButton.place(x=400, y=400, height=60, width=60)
         left_leg.place(x=430, y=320)
         left_thigh.place(x=440, y=240)
-
-        self.activateButton = inflateButton
-        self.resetButton = deflateButton
 
         gscale.place(x=500, y=400, height=40, width=100)
 
@@ -83,43 +76,51 @@ class Window(Frame):
         newvalue = min(self.valuelist, key=lambda x:abs(x-float(value)))
         self.slider[self.pouch_name] = newvalue
 
-    def write(self, input: str):
-        self.text.delete('1.0', END)
-        self.text.insert(INSERT, input)
-
     # Selection of the pouch using Radiobuttons. 
     def setSelection(self):
         self.pouch_name = self.pouches[self.selected.get()]
         self.slider[self.pouch_name] = self.scale.get()
-        self.write(self.pouch_name + " selected")
-        legal_min, legal_max = self.controller.get_pouch_size_range(self.pouch_name)
-        self.scale["from"] = legal_min
-        self.scale["to"] = legal_max
+        self.text.delete('1.0', END)
+        self.text.insert(INSERT, self.pouch_name + " selected")
 
-    # Brings the pouch to a given size. 
-    def activatePump(self):
-        # Ensure that we aren't deflating already.
-        print("__SIGNAL RECEIVED")
-        pouch_size = self.slider[self.pouch_name]
-        self.write("{0} to size {1}".format(self.pouch_name, pouch_size))
-        self.disableButton(self.activateButton)
-        self.controller.inflate_pouch_to_size(self.pouch_name, pouch_size)
-        #self.activateButton.update()
-        self.enableButton(self.activateButton)
+    def write(self, input: str):
+        self.text.delete('1.0', END)
+        self.text.insert(INSERT, input)
 
-    # Deflates the pouch.
-    def resetPouch(self):
-        # Ensure that we aren't inflating already.
-        self.controller.reset_pouch(self.pouch_name) 
-    
     def disableButton(self, button: Button):
-        button.config(state=DISABLED, bg="#ffffff", fg="#000000")
-        button.update()
+        button["state"] = DISABLED
+        button["bg"] = "#ffffff"
+        button["fg"] = "#000000"
 
-    def enableButton(self, button: Button):
-        button.update()
-        button.config(state=NORMAL, bg="firebrick", fg="white")
+    def setInflate(self):
+        if (not self.deflate):
+            self.inflate = not self.inflate
+            self.speed = 100 #self.slider.get()
+            print("Inflating: " + str(self.inflate))
+            print("Speed: " + str(self.speed))
 
+            if self.inflate:
+                self.pump.runWithSpeed(self.speed)
+            else:
+                self.pump.stop()
+        else:
+            print("Already deflating...")
+
+    def setDeflate(self):
+        if (not self.inflate):
+            self.deflate = not self.deflate
+            self.speed = 100 #self.slider.get()
+
+            print("Deflating: " + str(self.inflate))
+            print("Speed: " + str(self.speed))
+
+            if self.deflate:
+                self.depump.runWithSpeed(self.speed)
+            else:
+                self.depump.stop()
+        else: 
+            print("Already inflating...")
+    
     def cleanup(self):
         """
             Make sure setup is neutralised before shutting down

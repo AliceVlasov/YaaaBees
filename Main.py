@@ -1,7 +1,4 @@
-try:
-    from tkinter import *
-except ImportError:
-    from Tkinter import *
+from tkinter import *
 from GUI3 import Window
 from PIL import ImageTk, Image
 

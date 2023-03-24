@@ -23,17 +23,17 @@ class Pump:
         self.speed = new_speed
 
     def run(self):
-        print("starting pump {}".format(self.id))
+        #print("starting pump {}".format(self.id))
         if not _TESTING:
             mc.move_motor(self.id, self.speed)
 
     def runWithSpeed(self, speed):
-        print("starting pump {}".format(self.id))
+        #print("starting pump {}".format(self.id))
         if not _TESTING:
             mc.move_motor(self.id, speed)
 
     def stop(self):
-        print("stopping pump {}".format(self.id))
+        #print("stopping pump {}".format(self.id))
         if not _TESTING:
             mc.stop_motor(self.id)
         
@@ -84,7 +84,7 @@ class Pouch:
         if str(size) not in self.sizes:
             return -1
 
-        return self.size[str(size)]
+        return self.sizes[str(size)]
         
     
     def update_inflate_status(self, time_inflated: float) -> None:
@@ -191,12 +191,12 @@ class Pump_valve:
         self.name = name
     
     def open_deflate(self):
-        print("opening valve {}".format(self.name))
+        #print("opening valve {}".format(self.name))
         if not _TESTING:
             mc.stop_motor(self.id)
 
     def open_inflate(self):
-        print("closing valve {}".format(self.name))
+        #print("closing valve {}".format(self.name))
         if not _TESTING:
             mc.move_motor(self.id, self.speed)
     
@@ -213,12 +213,12 @@ class Silicone_valve:
         self.name = name
     
     def close(self):
-        print("closing valve {}".format(self.name))
+        #print("closing valve {}".format(self.name))
         if not _TESTING:
             mc.stop_motor(self.id)
 
     def open(self):
-        print("opening valve {}".format(self.name))
+        #print("opening valve {}".format(self.name))
         if not _TESTING:
             mc.move_motor(self.id, self.speed)
     
