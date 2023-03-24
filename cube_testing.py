@@ -4,18 +4,34 @@ from time import sleep
 
 inflate_time = 3
 
-controller = Cube_Controller()
-controller.stop_inflate()
-controller.stop_deflate()
-controller.inflate_to_size(6)
-sleep(10)
-controller.inflate_to_size(5)
-sleep(10)
-controller.inflate_to_size(4)
-sleep(10)
-controller.inflate_to_size(3)
-sleep(10)
+def safety_stop():
+    print("STOPPPED")
+
+controller = Cube_Controller(safety_stop)
+
+controller.stop_inflate(False)
+controller.stop_deflate(False)
 
 
-controller.reset_pouch()
+#controller.start_inflate(False)
+#sleep(inflate_time)
+#controller.stop_inflate(False)
+
+#controller.reset_pouch()
+
+#controller.start_inflate(True)
+#sleep(100)
+#controller.start_deflate(True)
+
+#controller.reset_pouch()
+
+#controller.start_inflate(True)
+#sleep(2)
+#controller.stop_inflate(True)
+
+#controller.start_deflate(True)
+#sleep(2)
+#controller.stop_deflate(True)
+
+#controller.reset()
 
