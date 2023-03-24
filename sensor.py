@@ -11,7 +11,18 @@ class Sensor:
 class Pressure_Sensor(Sensor):
     def __init__(self):
         self.sensor = ms5803py.MS5803()
+        self.is_working = True
     
     def read(self):
-        pressure, _ = self.sensor.read(pressure_osr=1024)
-        return pressure
+        pressure = None
+        count = 0
+        while (pressure == None and count < 10):
+            try:
+                pressure, _ = self.sensor.read(pressure_osr=1024)
+                return pressure
+            except:
+                print("cannot read sensor")
+                count += 1
+        self.is_working = False
+        print("sensor not working")
+        return None

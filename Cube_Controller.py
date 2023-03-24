@@ -136,7 +136,7 @@ class Cube_Controller:
         starting_pressure = self.cube.pressure()
         counter = 0
         
-        while self.cube_pressure_in_range() and self.keep_monitoring:
+        while self.safe_pressure() and self.keep_monitoring:
             sleep(0.1)
             
             # check that the pressure is changing at all!
@@ -150,10 +150,22 @@ class Cube_Controller:
                     self.keep_monitoring = False 
         
         if self.keep_monitoring:
-            print("Keep monitoring set to 0")
-            self.emergency_stop()
-        if not self.cube_pressure_in_range():
             print("Pressure exceeded safe range")
+            self.emergency_stop()
+            
+    
+    def safe_pressure(self) -> bool:
+        in_range = self.cube_pressure_in_range()
+        
+        if in_range == 0:
+            return True
+        if in_range < 0 and self.inflating:
+            return True
+        if in_range > 0 and self.deflating:
+            return True
+        
+        return False
+        
     
     def emergency_stop(self):
         """
@@ -167,9 +179,9 @@ class Cube_Controller:
             self.stop_deflate(False)
             self.gui_safety_stop()
     
-    def cube_pressure_in_range(self) -> bool:
+    def cube_pressure_in_range(self) -> int:
         """
-            :return: whether the cube is still within a safe pressure range
+            :return: -1 if pressure below safe range, 0 if pressure within safe range, 1 if pressure above safe range
         """
         return self.cube.pressure_within_range()
         
@@ -226,6 +238,12 @@ class Cube_Controller:
             prev_pressure = next_pressure
         
         print("exited")
+        
+        if (sgn != cur_sgn):
+            print("sgn != cur_sgn")
+
+        print("target pressure {0}, stopped at pressure {1}".format(target_pressure, self.cube.pressure()))
+        
         # stop inflating or deflating
         if sgn < 0:
             self.stop_deflate(False)

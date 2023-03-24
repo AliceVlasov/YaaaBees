@@ -136,6 +136,10 @@ class Pressure_Pouch(Pouch):
         self.deflate_speed = deflate_speed
 
         self.valve = Silicone_valve(valve_id, name+" valve")
+        
+        self.sensor = Pressure_Sensor()
+        
+        self.base_pressure = self.pressure()
 
         sorted_sizes = sorted(sizes)
         self.size_range = (sorted_sizes[0], sorted_sizes[-1])
@@ -146,29 +150,34 @@ class Pressure_Pouch(Pouch):
         self.close_valve()
 
         self.pressure_sizes = dict()
-        for (s,p) in list(zip(sizes, pressures)):
-            self.pressure_sizes[str(s)] = p 
+        joined = list(zip(sizes, pressures))
+        for i in range (len(joined)):
+            (s,p) = joined[i]
+            if i == 0:
+                self.pressure_sizes[s] = self.base_pressure
+            else:
+                self.pressure_sizes[s] = self.base_pressure + (p-joined[i-1][1])
         
-        sorted_pressures = sorted(pressures)
+        sorted_pressures = sorted(list(self.pressure_sizes.values()))
 
         self.pressure_range = (sorted_pressures[0], sorted_pressures[-1])
-        self.sensor = Pressure_Sensor()
+
     
     def get_base_pressure(self) -> float:
         """
             :return: the pressure (mBar) of the cube when it is in its resting position
         """
-        return self.pressure_range[0]
+        return self.base_pressure
 
     def get_pressure_for_size(self, size: int) -> float:
         """
             :param size: the target size(cm) for this pressure pouch
             :return the target pressure for the cube to achieve the given size, or -1 if the size is not defined for the cube
         """
-        if str(size) not in self.pressure_sizes:
+        if size not in self.pressure_sizes:
             return -1
         
-        return self.pressure_sizes[str(size)]
+        return self.pressure_sizes[size]
     
     def pressure(self) -> float:
         """
@@ -176,14 +185,22 @@ class Pressure_Pouch(Pouch):
         """
         return self.sensor.read()
 
-    def pressure_within_range(self) -> bool:
+    def pressure_within_range(self) -> int:
         """
-            :return: whether the current internal pressure of the pouch is within the safe range defined at initialisation
+            :return: -1 if pressure below safe range, 0 if pressure within safe range, 1 if pressure above safe range, -2 if pressure sensor is not working
         """
         pressure = self.pressure()
         print("current pressure = {}".format(pressure))
         print("pressure range: ({0}, {1})".format(self.pressure_range[0], self.pressure_range[1]))
-        return pressure > self.pressure_range[0] and pressure < self.pressure_range[1]
+        
+        if not self.sensor.is_working:
+            return -2
+        
+        if pressure < self.pressure_range[0]:
+            return -1
+        if pressure > self.pressure_range[1]:
+            return 1
+        return 0
 
 
 class Pump_valve:
