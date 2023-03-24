@@ -137,11 +137,11 @@ class Cube_Controller:
             
             # check that the pressure is changing at all!
             nxt_pressure = self.cube_pressure()
-            if abs(next_pressure - prev_pressure()) < 1:
+            if abs(nxt_pressure - prev_pressure()) < 1:
                 print("pressure is not changing")
                 self.keep_monitoring = False
             else:
-                prev_pressure = next_pressure
+                prev_pressure = nxt_pressure
         
         if self.keep_monitoring:
             self.emergency_stop()
@@ -164,27 +164,28 @@ class Cube_Controller:
         """
         return self.cube.pressure_within_range()
         
-    def reset_pouch(self):
+    def reset_pouch(self) -> bool:
         """
             Deflates the pouch until its base pressure is reached
+
+            :return: whether the pouch was reset successfully or not
         """
         base_pressure = self.cube.get_base_pressure()
 
-        self.start_deflate(False)
-        while(self.cube.pressure() > base_pressure):
-            sleep(0.1)
-        self.stop_deflate(False)
-
-        self.start_inflate(False)
-        while(self.cube.pressure() < base_pressure):
-            sleep(0.1)
-        self.stop_inflate(False)
+        return self.reach_pressure(base_pressure)
+    
+    def cmp(self, a: float, b: float) -> int:
+        if a < b:
+            return -1
+        if a > b:
+            return 1
+        return 0
     
     def reach_pressure(self, target_pressure:float) -> bool:
         pressure_is_changing = True
         prev_pressure = self.cube.pressure()
         
-        sgn = cmp(target_pressure, prev_pressure)
+        sgn = self.cmp(target_pressure, prev_pressure)
         
         # figure out if we should be inflating or deflating
         if sgn < 1:
@@ -198,22 +199,26 @@ class Cube_Controller:
         while (abs(prev_pressure-target_pressure) > 1 and sgn == cur_sgn and pressure_is_changing):
             sleep(0.1)
             next_pressure = self.cube.pressure()
-            cur_sgn = 
             
             if abs(next_pressure - prev_pressure()) < 1:
                 print("pressure not changing")
                 pressure_is_changing = False
+            
+            cur_sgn = self.cpm(target_pressure, next_pressure)
+
+            prev_pressure = next_pressure
                 
+        # stop inflating or deflating
+        if sgn < 1:
+            self.stop_deflate(False)
+        elif sgn > 1:
+            self.stop_inflate(False)
         
-        
-        # stop inflating
-        self.stop_inflate(False)
-        
-        if not pressure_is_change:
+        if not pressure_is_changing:
+            print("stopping pumps because pressure is not changing")
             return False
 
         return True
-        
     
     def inflate_to_size(self, size:int) -> bool:
         """
