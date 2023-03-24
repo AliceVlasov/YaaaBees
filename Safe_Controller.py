@@ -75,7 +75,7 @@ class Safe_Controller:
 
         print("Resetting pouch {}".format(pouch.name))
 
-        deflate_time = pouch.get_deflate_left()
+        deflate_time = pouch.get_deflate_needed() # from .get_deflate_left()
 
         self.start_deflate(pouch)
         sleep(deflate_time)
@@ -126,5 +126,17 @@ class Safe_Controller:
         return pouch.get_size_range()
         
 
-    
+    def cleanup(self):
+        """
+            Make sure all the pouches and pumps are reset and valves are in 
+            neutral position before shutting off
+        """
+        print("Cleaning up")
+
+        for pouch_name in self.pouches:
+           pouch = self.get_pouch(pouch_name)
+           self.reset_pouch(pouch_name) 
+           pouch.reset_valve()
+
+        self.pump_valve.reset()
     

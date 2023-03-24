@@ -5,7 +5,7 @@ except ImportError:
 from PIL import ImageTk, Image
 from time import sleep
 from Air import Pump
-from Controller import Controller
+from Safe_Controller import Safe_Controller
 
 class Window(Frame):
     inflate = False
@@ -14,20 +14,20 @@ class Window(Frame):
 
     def __init__(self, master=None):
         # Setup controller for hardware
-        self.controller = Controller(self.safetyStop)
+        self.controller = Safe_Controller()
         self.pouch_name = "cube"
         self.selected = IntVar()
         self.slider = {
-            "left leg": 1,
-            "left thigh": 1
+            "left_leg": 1,
+            "left_thigh": 1
         }
         self.pouches = {
             0: "cube",
-            1: "left leg",
-            2: "left thigh",
-            3: "thick sleeve",
-            4: "cylinder sleeve",
-            5: "thiccc thigh"
+            1: "left_leg",
+            2: "left_thigh",
+            3: "thick_sleeve",
+            4: "cylinder_sleeve",
+            5: "thiccc_thigh"
         }
 
         # Window settings 

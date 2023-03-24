@@ -1,11 +1,11 @@
-#from iotools import MotorControl
-#import smbus2 as smbus
+from iotools import MotorControl
+import smbus2 as smbus
 from time import sleep
 from datetime import datetime
 
 class MockMotorControl():
     def __init__(self):
-        print("Mock Motor control.")
+        print("-- Mock Motor control.")
         self.id = -1
         self.speed = -1
 
