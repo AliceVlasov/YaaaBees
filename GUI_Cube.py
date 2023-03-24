@@ -108,7 +108,7 @@ class Window(Frame):
         pouch_size = self.size
         self.write("{0} to size {1}".format(self.pouch_name, pouch_size))
         self.disableButton(self.activateButton)
-        self.controller.inflate_to_size(pouch_size)
+        self.controller.inflate_to_size(int(pouch_size))
         self.enableButton(self.activateButton)
 
     # Deflates the pouch.

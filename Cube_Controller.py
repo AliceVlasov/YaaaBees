@@ -133,30 +133,48 @@ class Cube_Controller:
             Once this condition is met, it checks if loop was stopped by unsafe pressure or by the main thread. If it was the main thread,
             no further action must be taken, if it was cause by unsafe pressure readings, then emergency stop is triggered.
         """
+        print("pressure monitor started")
         starting_pressure = self.cube.pressure()
+        pressure_changing = True
+        
+        if not self.cube.sensor.is_working():
+            sensor_working = False
+        
         counter = 0
         
-        while self.safe_pressure() and self.keep_monitoring:
+        while self.safe_pressure() and self.keep_monitoring and sensor_working and pressure_changing:
             sleep(0.1)
             
             # check that the pressure is changing at all!
-            cur_pressure = self.cube.pressure()
+            cur_pressure = self.cube.pressure() if self.cube.sensor.is_working() else starting_pressure
             counter += 1
             
             if counter == 10:
                 counter = 0      
                 if abs(cur_pressure - starting_pressure) < 0.5:
                     print("pressure is not changing")
-                    self.keep_monitoring = False 
+                    pressure_changing = False
+            
+            self.sensor_working = self.cube.sensor.is_working()
         
         if self.keep_monitoring:
             print("Pressure exceeded safe range")
+            self.emergency_stop()
+        
+        if not sensor_working:
+            print("stopping monitor because sensor is not working")
+            self.emergency_stop()
+        
+        if not pressure_changing:
+            print("stopping monitor because pressure is not changing")
             self.emergency_stop()
             
     
     def safe_pressure(self) -> bool:
         in_range = self.cube_pressure_in_range()
         
+        if in_range == -2:
+            return False
         if in_range == 0:
             return True
         if in_range < 0 and self.inflating:
@@ -192,6 +210,9 @@ class Cube_Controller:
             :return: whether the pouch was reset successfully or not
         """
         base_pressure = self.cube.get_base_pressure()
+        
+        if not self.cube.sensor.is_working():
+            return False
 
         return self.reach_pressure(base_pressure)
     
@@ -206,6 +227,9 @@ class Cube_Controller:
         pressure_is_changing = True
         start_pressure = self.cube.pressure()
         prev_pressure = start_pressure
+        
+        if not self.cube.sensor.is_working():
+            return False
         
         sgn = self.cmp(target_pressure, prev_pressure)
         print("target pressure = {0}, start_pressure = {1}".format(target_pressure, start_pressure))
@@ -224,7 +248,7 @@ class Cube_Controller:
         # while the current pressure does not overpass the target pressure, and the pressure continues to change
         while (abs(prev_pressure-target_pressure) > 1 and sgn == cur_sgn and pressure_is_changing):
             sleep(0.1)
-            next_pressure = self.cube.pressure()
+            next_pressure = self.cube.pressure() if self.cube.sensor.is_working() else prev_pressure
             counter += 1
             
             if counter == 10:          

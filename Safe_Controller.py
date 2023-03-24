@@ -20,10 +20,7 @@ class Safe_Controller:
         self.deflate_pump = Pump(_DEFLATE_PUMP_PORT, 0)
         self.pump_valve = Pump_valve(_PUMP_VALVE_PORT, "pump_valve")
         self.pouches = {
-            #'cube':              Pouch("cube", 100, 80, [1,2,3], [5,7,9], 0),
-            # 'thick sleeve':      Pouch("thick_sleeve", 100, 80, 4, 3),
-            # 'cylinder':          Pouch("cylinder", 50, 50, 2, 3),
-            # 'cylinder sleeve':   Pouch("cylinder_sleeve", 75, 60, 7, 3),
+                                                                #sizes in cm
             'left_thigh':        Pouch("left_thigh", 100, 60, [22,23,24,25,26], [(0,0),(5.5,4.5),(7,5),(9,6),(14,8)], 1),
             'left_leg':          Pouch("left_leg", 100, 60, [15,16,17,18,19], [(0,0),(2,1.5),(4,2.5),(6,3),(8.5,4.25)], 3),
         }

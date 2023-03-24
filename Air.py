@@ -139,7 +139,7 @@ class Pressure_Pouch(Pouch):
         
         self.sensor = Pressure_Sensor()
         
-        self.base_pressure = self.pressure()
+        self.base_pressure = self.pressure() if self.sensor.is_working() else min(pressures)
 
         sorted_sizes = sorted(sizes)
         self.size_range = (sorted_sizes[0], sorted_sizes[-1])
@@ -193,7 +193,8 @@ class Pressure_Pouch(Pouch):
         print("current pressure = {}".format(pressure))
         print("pressure range: ({0}, {1})".format(self.pressure_range[0], self.pressure_range[1]))
         
-        if not self.sensor.is_working:
+        if not self.sensor.is_working or pressure == None:
+            print("cannot check if pressure within range")
             return -2
         
         if pressure < self.pressure_range[0]:
