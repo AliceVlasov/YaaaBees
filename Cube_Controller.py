@@ -31,6 +31,9 @@ class Cube_Controller:
 
         self.inflating = False
         self.deflating = False
+        
+        self.reset_pouch()
+        print("FINISHED SETUP")
     
     def start_pressure_monitor(self):
         """
@@ -130,21 +133,27 @@ class Cube_Controller:
             Once this condition is met, it checks if loop was stopped by unsafe pressure or by the main thread. If it was the main thread,
             no further action must be taken, if it was cause by unsafe pressure readings, then emergency stop is triggered.
         """
-        prev_pressure = self.cube.pressure()
+        starting_pressure = self.cube.pressure()
+        counter = 0
         
         while self.cube_pressure_in_range() and self.keep_monitoring:
             sleep(0.1)
             
             # check that the pressure is changing at all!
-            nxt_pressure = self.cube_pressure()
-            if abs(nxt_pressure - prev_pressure()) < 1:
-                print("pressure is not changing")
-                self.keep_monitoring = False
-            else:
-                prev_pressure = nxt_pressure
+            cur_pressure = self.cube.pressure()
+            counter += 1
+            
+            if counter == 5:
+                counter = 0      
+                if abs(cur_pressure - starting_pressure) < 0.5:
+                    print("pressure is not changing")
+                    self.keep_monitoring = False 
         
         if self.keep_monitoring:
+            print("Keep monitoring set to 0")
             self.emergency_stop()
+        if not self.cube_pressure_in_range():
+            print("Pressure exceeded safe range")
     
     def emergency_stop(self):
         """
@@ -183,7 +192,8 @@ class Cube_Controller:
     
     def reach_pressure(self, target_pressure:float) -> bool:
         pressure_is_changing = True
-        prev_pressure = self.cube.pressure()
+        start_pressure = self.cube.pressure()
+        prev_pressure = start_pressure
         
         sgn = self.cmp(target_pressure, prev_pressure)
         
@@ -194,17 +204,22 @@ class Cube_Controller:
             self.start_inflate(False)
         
         cur_sgn = sgn
+        
+        counter = 0
         # continue inflating/deflating while the difference between the current pressure and target pressure is large,
         # while the current pressure does not overpass the target pressure, and the pressure continues to change
         while (abs(prev_pressure-target_pressure) > 1 and sgn == cur_sgn and pressure_is_changing):
             sleep(0.1)
             next_pressure = self.cube.pressure()
+            counter += 1
             
-            if abs(next_pressure - prev_pressure()) < 1:
-                print("pressure not changing")
-                pressure_is_changing = False
+            if counter == 5:          
+                if abs(next_pressure - start_pressure) < 0.5:
+                    print("pressure not changing")
+                    pressure_is_changing = False
+                counter = 0
             
-            cur_sgn = self.cpm(target_pressure, next_pressure)
+            cur_sgn = self.cmp(target_pressure, next_pressure)
 
             prev_pressure = next_pressure
                 

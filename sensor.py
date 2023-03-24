@@ -9,5 +9,5 @@ class Pressure_Sensor(Sensor):
         self.sensor = ms5803py.MS5803()
     
     def read(self):
-        pressure, _ = self.sensor.read(pressure_osr=4096)
+        pressure, _ = self.sensor.read(pressure_osr=1024)
         return pressure

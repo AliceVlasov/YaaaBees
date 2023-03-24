@@ -23,17 +23,17 @@ class Pump:
         self.speed = new_speed
 
     def run(self):
-        print("starting pump {}".format(self.id))
+        #print("starting pump {}".format(self.id))
         if not _TESTING:
             mc.move_motor(self.id, self.speed)
 
     def runWithSpeed(self, speed):
-        print("starting pump {}".format(self.id))
+        #print("starting pump {}".format(self.id))
         if not _TESTING:
             mc.move_motor(self.id, speed)
 
     def stop(self):
-        print("stopping pump {}".format(self.id))
+        #print("stopping pump {}".format(self.id))
         if not _TESTING:
             mc.stop_motor(self.id)
         
@@ -177,6 +177,8 @@ class Pressure_Pouch(Pouch):
             :return: whether the current internal pressure of the pouch is within the safe range defined at initialisation
         """
         pressure = self.pressure()
+        print("current pressure = {}".format(pressure))
+        print("pressure range: ({0}, {1})".format(self.pressure_range[0], self.pressure_range[1]))
         return pressure > self.pressure_range[0] and pressure < self.pressure_range[1]
 
 
@@ -191,12 +193,12 @@ class Pump_valve:
         self.name = name
     
     def open_deflate(self):
-        print("opening valve {}".format(self.name))
+        #print("opening valve {}".format(self.name))
         if not _TESTING:
             mc.stop_motor(self.id)
 
     def open_inflate(self):
-        print("closing valve {}".format(self.name))
+        #print("closing valve {}".format(self.name))
         if not _TESTING:
             mc.move_motor(self.id, self.speed)
     
@@ -213,12 +215,12 @@ class Silicone_valve:
         self.name = name
     
     def close(self):
-        print("closing valve {}".format(self.name))
+        #print("closing valve {}".format(self.name))
         if not _TESTING:
             mc.stop_motor(self.id)
 
     def open(self):
-        print("opening valve {}".format(self.name))
+        #print("opening valve {}".format(self.name))
         if not _TESTING:
             mc.move_motor(self.id, self.speed)
     
