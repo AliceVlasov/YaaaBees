@@ -10,7 +10,7 @@ from Safe_Controller import Safe_Controller
 class Window(Frame):
     inflate = False
     deflate = False
-    valuelist = [1, 2, 3, 4, 5, 6]
+    valuelist = []
 
     def __init__(self, master=None):
         # Setup controller for hardware
@@ -23,6 +23,7 @@ class Window(Frame):
             "left_thigh": 1
         }
         self.pouches = {
+            0: "cube",
             1: "left_leg",
             2: "left_thigh",
         }
@@ -98,11 +99,13 @@ class Window(Frame):
         self.write(self.pouch_name + " selected")
         legal_min, legal_max = self.controller.get_pouch_size_range(self.pouch_name)
         self.scale["from"] = legal_min
-        newvalues = []
         self.scale["to"] = legal_max
+        newvalues = []
         for i in range(legal_min, legal_max):
             newvalues.append(i)
-
+        
+        self.valuelist = newvalues    
+        
     # Brings the pouch to a given size. 
     def activatePump(self):
         # Ensure that we aren't deflating already.
@@ -116,6 +119,7 @@ class Window(Frame):
     # Deflates the pouch.
     def resetPouch(self):
         # Ensure that we aren't inflating already 
+        self.write("Resetting the pouch")
         self.disableButton(self.resetButton)
         self.controller.reset_pouch(self.pouch_name)
         self.enableButton(self.resetButton)

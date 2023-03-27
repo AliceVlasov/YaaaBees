@@ -1,5 +1,9 @@
 import ms5803py
 
+class MS5803():
+    def read(i):
+        return None
+
 class Sensor:
     def read(self) -> float:
         return 0.00
