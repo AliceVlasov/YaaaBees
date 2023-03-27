@@ -67,12 +67,17 @@ class Window(Frame):
         #set default selection to left_thigh
         self.selected.set(2)
     
+        # Slider label
+        slider_label = Label(self.master, text="circumference in cm")
+        slider_label.place(x=495+xshift, y=378+yshift)
+
+        # Slider 
         gscale = Scale(self.master, cursor="dot", from_=1, to=6, orient=HORIZONTAL, command=self.valuecheck)
         self.scale = gscale
         legal_min, legal_max = self.controller.get_pouch_size_range("left_thigh")
-        self.scale["from"] = legal_min
-        self.scale["to"] = legal_max
+        self.scale["from"], self.scale["to"] = legal_min, legal_max
         self.slider[self.pouch_name] = gscale.get()
+        gscale.place(x=500+xshift, y=400+yshift, height=40, width=100)
 
         # Place all the buttons. 
         inflateButton.place(x=340+xshift, y=400+yshift, height=60, width=60)
@@ -82,8 +87,6 @@ class Window(Frame):
 
         self.activateButton = inflateButton
         self.resetButton = deflateButton
-
-        gscale.place(x=500+xshift, y=400+yshift, height=40, width=100)
 
         self.master.mainloop()
 
@@ -99,7 +102,6 @@ class Window(Frame):
     # Selection of the pouch using Radiobuttons. 
     def setSelection(self):
         self.pouch_name = self.pouches[self.selected.get()]
-        self.slider[self.pouch_name] = self.scale.get()
         self.write(self.pouch_name + " selected")
         legal_min, legal_max = self.controller.get_pouch_size_range(self.pouch_name)
         self.scale["from"] = legal_min
@@ -108,6 +110,8 @@ class Window(Frame):
         for i in range(legal_min, legal_max):
             newvalues.append(i)
         self.valuelist = newvalues
+        self.scale.set(newvalues[0])
+        self.slider[self.pouch_name] = self.scale.get()
         
     # Brings the pouch to a given size. 
     def activatePump(self):
@@ -116,16 +120,23 @@ class Window(Frame):
         pouch_size = self.slider[self.pouch_name]
         self.write("{0} to size {1}".format(self.pouch_name, pouch_size))
         self.disableButton(self.activateButton)
+        self.disableButton(self.resetButton)
+        # self.activateButton.config(state=DISABLED, bg="#ffffff", fg="#000000")
+        # self.activateButton.update()
         self.controller.inflate_pouch_to_size(self.pouch_name, int(pouch_size))
         self.enableButton(self.activateButton)
+        self.enableButton(self.resetButton)
+        # self.activateButton.update()
+        # self.activateButton.config(state=NORMAL, bg="firebrick", fg="white")
 
     # Deflates the pouch.
     def resetPouch(self):
-        # Ensure that we aren't inflating already 
         self.write("Resetting the pouch")
         self.disableButton(self.resetButton)
+        self.disableButton(self.activateButton)
         self.controller.reset_pouch(self.pouch_name)
         self.enableButton(self.resetButton)
+        self.enableButton(self.activateButton)
 
     def disableButton(self, button: Button):
         button.config(state=DISABLED, bg="#ffffff", fg="#000000")
