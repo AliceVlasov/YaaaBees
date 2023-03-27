@@ -75,7 +75,6 @@ class Window(Frame):
         legal_min, legal_max = self.controller.get_pouch_size_range("left_thigh")
         gscale = Scale(self.master, cursor="dot", from_=legal_min, to=legal_max, orient=HORIZONTAL) #, command=self.valuecheck)
         self.scale = gscale
-        # self.scale["from"], self.scale["to"] = legal_min, legal_max
         self.slider[self.pouch_name] = gscale.get()
         gscale.place(x=500+xshift, y=400+yshift, height=40, width=100)
 
