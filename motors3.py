@@ -19,7 +19,7 @@ class MockMotorControl():
 class Motors(object):
     def __init__(self):
         print ("Starting SMBus . . .")
-        #self.bus = smbus.SMBus(1)
+        self.bus = smbus.SMBus(1)
         sleep(2)
         print ("SMBus Started.")
         self.mc = MotorControl()
