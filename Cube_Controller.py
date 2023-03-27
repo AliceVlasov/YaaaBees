@@ -25,7 +25,7 @@ class Cube_Controller:
         
         self.pressure_monitor = None
         self.keep_monitoring = False
-        #self.reset_pouch()
+        self.reset_pouch()
 
         self.gui_safety_stop = gui_safety_stop
 
