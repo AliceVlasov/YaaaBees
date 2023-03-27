@@ -1,7 +1,4 @@
-try:
-    from tkinter import *
-except ImportError:
-    from Tkinter import *
+from tkinter import *
 from PIL import ImageTk, Image
 from time import sleep
 from Air import Pump
@@ -10,7 +7,6 @@ from Safe_Controller import Safe_Controller
 class Window(Frame):
     inflate = False
     deflate = False
-    valuelist = []
 
     def __init__(self, master=None):
         # Window settings 
@@ -29,6 +25,7 @@ class Window(Frame):
             "left_leg": self.controller.get_pouch_size_range("left_leg")[0],
             "left_thigh": self.controller.get_pouch_size_range("left_thigh")[0]
         }
+        # For updating the selection labels' sizes.
         self.textvars = {
             "left_leg": StringVar(self.master, "left_leg: " + str(self.slider["left_leg"])), 
             "left_thigh": StringVar(self.master, "left_thigh: " + str(self.slider["left_thigh"])),
@@ -50,6 +47,7 @@ class Window(Frame):
         lab = Label(self.master, image=img)
         lab.place(x=0+xshift, y=-40+yshift, relwidth=1, relheight=1)
 
+        # Textbox 
         text = Text(self.master, height=2, width=30, font=('Verdana', 10))
         text.insert(INSERT, self.pouch_name + " selected")
         text.place(x=525+xshift, y=100+yshift)
@@ -89,12 +87,7 @@ class Window(Frame):
 
         self.master.mainloop()
 
-    # # Value check for the stepped slider functionality. 
-    # def valuecheck(self, value: int):
-    #     #newvalue = min(self.valuelist, key=lambda x:abs(x-float(value)))
-    #     self.slider[self.pouch_name] = value
-    #     print(self.slider)
-
+    # Writes the given input to the textbox. 
     def write(self, input: str):
         self.text.delete('1.0', END)
         self.text.insert(INSERT, input)
@@ -106,9 +99,9 @@ class Window(Frame):
         legal_min, legal_max = self.controller.get_pouch_size_range(self.pouch_name)
         self.scale["from"] = legal_min
         self.scale["to"] = legal_max
-        newvalues = []
-        for i in range(legal_min, legal_max):
-            newvalues.append(i)
+        # newvalues = []
+        # for i in range(legal_min, legal_max):
+        #     newvalues.append(i)
         # self.slider[self.pouch_name] = self.scale.get()
         self.scale.set(self.slider[self.pouch_name])
 
