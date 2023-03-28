@@ -136,6 +136,7 @@ class Cube_Controller:
         print("pressure monitor started")
         starting_pressure = self.cube.pressure()
         pressure_changing = True
+        sensor_working = True
         
         if not self.cube.sensor.is_working():
             sensor_working = False
