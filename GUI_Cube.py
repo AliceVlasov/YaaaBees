@@ -1,7 +1,4 @@
-try:
-    from tkinter import *
-except ImportError:
-    from Tkinter import *
+from tkinter import *
 from PIL import ImageTk, Image
 from time import sleep
 from Air import Pump
@@ -92,66 +89,71 @@ class Window(Frame):
         self.text.delete('1.0', END)
         self.text.insert(INSERT, input)
 
-    # Selection of the pouch using Radiobuttons. 
-    # def setSelection(self):
-    #     self.pouch_name = self.pouches[self.selected.get()]
-    #     self.slider[self.pouch_name] = self.scale.get()
-    #     self.write(self.pouch_name + " selected")
-    #     legal_min, legal_max = self.controller.get_pouch_size_range(self.pouch_name)
-    #     self.scale["from"] = legal_min
-    #     self.scale["to"] = legal_max
-
     # Brings the pouch to a given size. 
     def activatePump(self):
         # Ensure that we aren't deflating already.
         print("__SIGNAL RECEIVED")
         pouch_size = self.size
         self.write("{0} to size {1}".format(self.pouch_name, pouch_size))
-        self.disableButton(self.activateButton)
+        self.disableAll() # self.disableButton(self.activateButton)
         self.controller.inflate_to_size(pouch_size)
-        self.enableButton(self.activateButton)
+        self.enableAll() # self.enableButton(self.activateButton, self.activateButton["bg"], self.activateButton["bg"])
 
     # Deflates the pouch.
     def resetPouch(self):
         # Ensure that we aren't inflating already 
-        self.disableButton(self.resetButton)
+        self.disableAll() # self.disableButton(self.resetButton)
         self.controller.reset_pouch()
-        self.enableButton(self.resetButton)
+        self.enableAll() # self.enableButton(self.resetButton, self.activateButton["bg"], self.activateButton["bg"])
 
         # Inflates the pouch. 
     def setInflate(self):
         # Ensure that we aren't deflating already.
         print(self.size)
-        assert (not self.deflate)
-
-        if not self.inflate:
-            success = self.controller.start_inflate(self.isSafetyOn)
-        else:
-            success = self.controller.stop_inflate(self.isSafetyOn)
-        
-        if success:
-            self.inflate = not self.inflate
+        if (not self.deflate):
+            if not self.inflate:
+                success = self.controller.start_inflate(self.isSafetyOn)
+            else:
+                success = self.controller.stop_inflate(self.isSafetyOn)
+            
+            if success:
+                self.inflate = not self.inflate
+        else: 
+            self.write("Cannot inflate and deflate at the same time.")
 
     # Deflates the pouch.
     def setDeflate(self):
         # Ensure that we aren't inflating already.
-        assert (not self.inflate)
-
-        if not self.deflate:
-            success = self.controller.start_deflate(self.isSafetyOn)
-        else:
-            success = self.controller.stop_deflate(self.isSafetyOn)
-        
-        if success:
-            self.deflate = not self.deflate
+        if (not self.inflate):
+            if not self.deflate:
+                success = self.controller.start_deflate(self.isSafetyOn)
+            else:
+                success = self.controller.stop_deflate(self.isSafetyOn)
+            
+            if success:
+                self.deflate = not self.deflate
+        else: 
+            self.write("Cannot inflate and deflate at the same time.")
 
     def disableButton(self, button: Button):
         button.config(state=DISABLED, bg="#ffffff", fg="#000000")
         button.update()
 
-    def enableButton(self, button: Button):
+    def enableButton(self, button: Button, color: str, text_color: str):
         button.update()
-        button.config(state=NORMAL, bg="firebrick", fg="white")
+        button.config(state=NORMAL, bg=color, fg=text_color)
+
+    def disableAll(self):
+        self.disableButton(self.activateButton)
+        self.disableButton(self.resetButton)
+        self.disableButton(self.inflateButton)
+        self.disableButton(self.deflateButton)
+
+    def enableAll(self):
+        self.enableButton(self.activateButton, "firebrick", "white")
+        self.enableButton(self.resetButton, "firebrick", "white")
+        self.enableButton(self.inflateButton, "navy", "white")
+        self.enableButton(self.deflateButton, "navy", "white")
 
     def gui_safety_stop(self):
         self.write("Maximum inflation capacity reached.")
