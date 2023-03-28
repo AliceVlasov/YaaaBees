@@ -21,7 +21,7 @@ class Safe_Controller:
         self.pump_valve = Pump_valve(_PUMP_VALVE_PORT, "pump_valve")
         self.pouches = {
                                                                 #sizes in cm
-            'left_thigh':        Pouch("left_thigh", 100, 60, [22,23,24,25,26], [(0,0),(5.5,4.5),(7,5),(9,6),(14,8)], 1),
+            'left_thigh':        Pouch("left_thigh", 100, 60, [22,23,24,25,26], [(0,0),(5.5,4.5),(7,5),(9,6),(14,10)], 1),
             'left_leg':          Pouch("left_leg", 100, 60, [15,16,17,18,19], [(0,0),(2,1.5),(4,2.5),(6,3),(8.5,4.25)], 3),
         }
     

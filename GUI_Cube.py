@@ -183,11 +183,11 @@ class Window(Frame):
         if (self.inflate):
             self.disableButton(self.inflateButton)
             self.inflate = False
-            self.write("Maximum inflation capacity reached.")
+            self.write("Maximum inflation capacity reached")
         elif (self.deflate):
             self.disableButton(self.deflateButton)
             self.deflate = False
-            self.write("Maximum deflation capacity reached.")
+            self.write("Maximum deflation capacity reached")
 
     def cleanup(self):
         """
