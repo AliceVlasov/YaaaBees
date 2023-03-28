@@ -56,7 +56,13 @@ class Window(Frame):
         resetButton = Button(self.master, text="Reset", command=self.resetPouch, bg="firebrick", fg="white")
         inflateButton = Button(self.master, text="Inflate", command=self.setInflate, bg="navy", fg="white")
         deflateButton = Button(self.master, text="Deflate", command=self.setDeflate, bg="navy", fg="white")
-
+        
+        self.activateButton = activateButton
+        self.resetButton = resetButton
+        self.inflateButton = inflateButton
+        self.deflateButton = deflateButton
+        self.disableButton(self.deflateButton)
+    
         # Create the pouch selection buttons. 
         # left_leg = Radiobutton(self.master, text="left_leg", variable=self.selected, value=1, command=self.setSelection)
         # left_thigh = Radiobutton(self.master, text="left_thigh", variable=self.selected, value=2, command=self.setSelection)
@@ -64,17 +70,14 @@ class Window(Frame):
         gscale = Scale(self.master, cursor="dot", from_=self.controller.get_pouch_size_range()[0], to=self.controller.get_pouch_size_range()[1], orient=HORIZONTAL, command=self.valuecheck)
         self.scale = gscale
         self.size = gscale.get()
+        slider_label = Label(self.master, text="height in cm")
+        slider_label.place(x=158+xshift, y=80+yshift)
 
         # Place all the buttons. 
         activateButton.place(x=135+xshift, y=160+yshift, height=60, width=60)
         resetButton.place(x=205+xshift, y=160+yshift, height=60, width=60)
         inflateButton.place(x=535+xshift, y=160+yshift, height=60, width=60)
         deflateButton.place(x=605+xshift, y=160+yshift, height=60, width=60)
-
-        self.activateButton = activateButton
-        self.resetButton = resetButton
-        self.inflateButton = inflateButton
-        self.deflateButton = deflateButton
 
         gscale.place(x=135+xshift, y=100+yshift, height=40, width=140)
 

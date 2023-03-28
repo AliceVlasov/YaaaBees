@@ -289,8 +289,6 @@ class Cube_Controller:
             :return: whether the pouch was inflated successfully or not
         """
 
-        self.reset_pouch()
-
         inflate_pressure = self.cube.get_pressure_for_size(size)
 
         if inflate_pressure == -1:
