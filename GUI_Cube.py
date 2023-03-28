@@ -94,7 +94,7 @@ class Window(Frame):
         # Ensure that we aren't deflating already.
         print("__SIGNAL RECEIVED")
         pouch_size = self.size
-        self.write("{0} to size {1}".format(self.pouch_name, pouch_size))
+        self.write("Cube size set to {0}".format(pouch_size))
 
         self.disableAll() # self.disableButton(self.activateButton)
         self.controller.inflate_to_size(int(pouch_size))
@@ -102,23 +102,31 @@ class Window(Frame):
 
     # Deflates the pouch.
     def resetPouch(self):
-        # Ensure that we aren't inflating already 
+        self.write("Resetting")
         self.disableAll() # self.disableButton(self.resetButton)
         self.controller.reset_pouch()
         self.enableAll() # self.enableButton(self.resetButton, self.activateButton["bg"], self.activateButton["bg"])
-
+        self.write("Reset to initial size")
         # Inflates the pouch. 
     def setInflate(self):
         # Ensure that we aren't deflating already.
         print(self.size)
-        if (not self.deflate):
-            if not self.inflate:
-                success = self.controller.start_inflate(self.isSafetyOn)
+        if (not self.deflate):                
+            self.inflate = not self.inflate
+            print("Inflating: " + str(self.inflate))
+
+            if self.inflate:
+                self.disableButton(self.activateButton)
+                self.disableButton(self.resetButton)
+                self.disableButton(self.deflateButton)
+                self.write("Inflating")
+                self.controller.start_inflate(self.isSafetyOn)
             else:
-                success = self.controller.stop_inflate(self.isSafetyOn)
-            
-            if success:
-                self.inflate = not self.inflate
+                self.enableButton(self.activateButton, "firebrick", "white")
+                self.enableButton(self.resetButton, "firebrick", "white")
+                self.enableButton(self.deflateButton, "navy", "white")
+                self.write("Stopped inflating")
+                self.controller.stop_inflate(self.isSafetyOn)
         else: 
             self.write("Cannot inflate and deflate at the same time.")
 
@@ -126,13 +134,24 @@ class Window(Frame):
     def setDeflate(self):
         # Ensure that we aren't inflating already.
         if (not self.inflate):
-            if not self.deflate:
-                success = self.controller.start_deflate(self.isSafetyOn)
+            if (self.inflateButton["state"] == DISABLED):
+                self.enableButton(self.inflateButton, "navy", "white")
+            self.deflate = not self.deflate
+
+            print("Deflating: " + str(self.deflate))
+
+            if self.deflate:
+                self.disableButton(self.activateButton)
+                self.disableButton(self.resetButton)
+                self.disableButton(self.inflateButton)
+                self.write("Deflating")
+                self.controller.start_deflate(self.isSafetyOn)
             else:
-                success = self.controller.stop_deflate(self.isSafetyOn)
-            
-            if success:
-                self.deflate = not self.deflate
+                self.enableButton(self.activateButton, "firebrick", "white")
+                self.enableButton(self.resetButton, "firebrick", "white")
+                self.enableButton(self.inflateButton, "navy", "white")
+                self.write("Stopped deflating")
+                self.controller.stop_deflate(self.isSafetyOn)
         else: 
             self.write("Cannot inflate and deflate at the same time.")
 
@@ -157,8 +176,15 @@ class Window(Frame):
         self.enableButton(self.deflateButton, "navy", "white")
 
     def gui_safety_stop(self):
-        self.write("Maximum inflation capacity reached.")
-        self.disableButton(self.inflateButton)
+        self.enableAll()
+        if (self.inflate):
+            self.disableButton(self.inflateButton)
+            self.inflate = False
+            self.write("Maximum inflation capacity reached.")
+        elif (self.deflate):
+            self.disableButton(self.deflateButton)
+            self.deflate = False
+            self.write("Maximum deflation capacity reached.")
 
     def cleanup(self):
         """
