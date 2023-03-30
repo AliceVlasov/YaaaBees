@@ -50,4 +50,3 @@ class Motors(object):
         self.__i2c_read_encoder()
         ts = str(datetime.now())
         print (self.encoder_data, ts.rjust(50,'.'))
-

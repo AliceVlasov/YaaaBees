@@ -7,9 +7,13 @@ def safety_stop():
     print("STOPPPED")
     
 controller = Cube_Controller(safety_stop)
+controller.start_inflate(True)
+sleep(20)
+#controller.stop_inflate(True)
+
 #controller.stop_inflate(False)
-controller.inflate_to_size(6)
-controller.inflate_to_size(4)
+#controller.inflate_to_size(6)
+#controller.inflate_to_size(4)
 
 #controller = Cube_Controller(safety_stop)
 

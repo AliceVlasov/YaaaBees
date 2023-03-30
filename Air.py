@@ -43,7 +43,7 @@ class Pump:
         self.stop()
 
 class Pouch:
-    def __init__(self, name: str, inflate_speed: int, deflate_speed: int, sizes: List[int], times: List[float], valve_id: int):
+    def __init__(self, name: str, inflate_speed: int, deflate_speed: int, sizes: List[int], times: List[Tuple[float, float]], valve_id: int):
         """
             Initialise a new Silicone Pouch
 
@@ -60,20 +60,24 @@ class Pouch:
 
         self.valve = Silicone_valve(valve_id, name+" valve")
 
+        # make dictionary of size to inflate/deflate times
         self.sizes = dict()
         for (s,t) in list(zip(sizes, times)):
-            self.sizes[str(s)] = t
+            self.sizes[s] = [t[0], t[1]]
 
         sorted_sizes = sorted(sizes)
         self.size_range = (sorted_sizes[0], sorted_sizes[-1])
 
-        self.inflate_status = 0 # pouch starts neutral
+        self.current_size = sizes[0] # pouch starts neutral
 
         # make sure valve is closed by default
         self.close_valve()
     
-    def get_deflate_needed(self):
-        return self.inflate_status
+    def get_deflate_needed(self) -> float:
+        """
+            :return: the amount of time needed to deflate this pouch until it reaches its neutral state
+        """
+        return self.sizes[self.current_size][1]
     
     def get_inflate_time_for_size(self, size: int):
         """
@@ -81,24 +85,24 @@ class Pouch:
         
             :param size: the size (cm) setting for this pouch
         """
-        if str(size) not in self.sizes:
+        if size not in self.sizes:
             return -1
 
-        return self.sizes[str(size)]
+        return self.sizes[size][0]
         
     
-    def update_inflate_status(self, time_inflated: float) -> None:
+    def update_inflate_status(self, size: int) -> None:
         """
             Updates the net amount of time the pouch has spend inflating
 
-            :param time_inflated: the amount of time this pouch has been inflating so far, if deflating, this should be negative
+            :param size: the current size of the pouch
         """
-        print("increased pouch {0}'s inflate status by {1}".format(self.name, time_inflated))
-        self.inflate_status += time_inflated
+        print("pouch {0}'s size is now {1}".format(self.name, size))
+        self.current_size = size
     
     def reset_inflate_status(self):
-        print("reset pouch {}'s inflate status to 0".format(self.name))
-        self.inflate_status = 0
+        self.current_size = self.size_range[0]
+        print("reset pouch {0}'s size to {1}".format(self.name, self.current_size))
     
     def get_size_range(self) -> Tuple[int,int]:
         """
@@ -132,6 +136,10 @@ class Pressure_Pouch(Pouch):
         self.deflate_speed = deflate_speed
 
         self.valve = Silicone_valve(valve_id, name+" valve")
+        
+        self.sensor = Pressure_Sensor()
+        
+        self.base_pressure = self.pressure() if self.sensor.is_working() else min(pressures)
 
         sorted_sizes = sorted(sizes)
         self.size_range = (sorted_sizes[0], sorted_sizes[-1])
@@ -142,29 +150,34 @@ class Pressure_Pouch(Pouch):
         self.close_valve()
 
         self.pressure_sizes = dict()
-        for (s,p) in list(zip(sizes, pressures)):
-            self.pressure_sizes[str(s)] = p 
+        joined = list(zip(sizes, pressures))
+        for i in range (len(joined)):
+            (s,p) = joined[i]
+            if i == 0:
+                self.pressure_sizes[s] = self.base_pressure
+            else:
+                self.pressure_sizes[s] = self.base_pressure + (p-joined[i-1][1])
         
-        sorted_pressures = sorted(pressures)
+        sorted_pressures = sorted(list(self.pressure_sizes.values()))
 
         self.pressure_range = (sorted_pressures[0], sorted_pressures[-1])
-        self.sensor = Pressure_Sensor()
+
     
     def get_base_pressure(self) -> float:
         """
             :return: the pressure (mBar) of the cube when it is in its resting position
         """
-        return self.pressure_range[0]
+        return self.base_pressure
 
     def get_pressure_for_size(self, size: int) -> float:
         """
             :param size: the target size(cm) for this pressure pouch
             :return the target pressure for the cube to achieve the given size, or -1 if the size is not defined for the cube
         """
-        if str(size) not in self.pressure_sizes:
+        if size not in self.pressure_sizes:
             return -1
         
-        return self.pressure_sizes[str(size)]
+        return self.pressure_sizes[size]
     
     def pressure(self) -> float:
         """
@@ -172,14 +185,23 @@ class Pressure_Pouch(Pouch):
         """
         return self.sensor.read()
 
-    def pressure_within_range(self) -> bool:
+    def pressure_within_range(self) -> int:
         """
-            :return: whether the current internal pressure of the pouch is within the safe range defined at initialisation
+            :return: -1 if pressure below safe range, 0 if pressure within safe range, 1 if pressure above safe range, -2 if pressure sensor is not working
         """
         pressure = self.pressure()
         print("current pressure = {}".format(pressure))
         print("pressure range: ({0}, {1})".format(self.pressure_range[0], self.pressure_range[1]))
-        return pressure > self.pressure_range[0] and pressure < self.pressure_range[1]
+        
+        if not self.sensor.is_working or pressure == None:
+            print("cannot check if pressure within range")
+            return -2
+        
+        if pressure < self.pressure_range[0]:
+            return -1
+        if pressure > self.pressure_range[1]:
+            return 1
+        return 0
 
 
 class Pump_valve:

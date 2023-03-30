@@ -1,4 +1,4 @@
-from motors import Motors
+from motors3 import Motors
 from time import time, sleep
 
 mc = Motors()
