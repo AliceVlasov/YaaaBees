@@ -1,0 +1,16 @@
+Pouch(
+    unique name,
+    inflate pump speed, 
+    deflate pump speed, 
+    sizes that this pouch can reach, 
+    times (in seconds) needed to inflate to each size and 
+    deflate to resting from each size
+)
+
+Pressure_Pouch(
+    unique name,
+    inflate pump speed, 
+    deflate pump speed, 
+    sizes that this pouch can reach, 
+    pressure (mBar) within the pouch at each size
+)
