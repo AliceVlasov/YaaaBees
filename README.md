@@ -9,4 +9,4 @@ If an error occurs and the pumps or valves do not turn off correctly, run emerge
 
 Air.py has all the hardware-control functionality.
 
-See https://docs.google.com/drawings/d/1iiNrprrmitW4A5fImg711Zits6A8UIad0X0ZcEftsuo/edit for valve connections (may need to double-check that this is correct).
+See https://docs.google.com/drawings/d/1iiNrprrmitW4A5fImg711Zits6A8UIad0X0ZcEftsuo/edit?usp=sharing for valve connections (may need to double-check that this is correct).
